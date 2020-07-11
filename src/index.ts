@@ -1,9 +1,4 @@
-import express from 'express';
+import SocketServer from "./SocketServer";
 
-const port = 3000;
-const app = express();
-app.get("/", (req: express.Request, resp: express.Response) => {
-    console.log(req, resp);
-    resp.send("foo")
-});
-app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`));
+const socketServer = new SocketServer();
+socketServer.start();
