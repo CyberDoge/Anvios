@@ -1,5 +1,6 @@
 import * as mongoose from "mongoose";
 import {Document, Model} from "mongoose";
+import {compare} from "bcrypt";
 
 export interface IUserSchema extends Document {
     token?: String,
@@ -34,7 +35,13 @@ const userSchema = new mongoose.Schema({
 
 
 userSchema.statics.findIdByLoginAndPassword = async function (login: string, password: string): Promise<string | null> {
-    return (await this.findOne({login, password}).select("_id").lean())?._id.toString() || null
+    const userIdAndPassword = await this.findOne({login}).select("_id password").lean();
+    if (userIdAndPassword.password) {
+        if (await compare(password, userIdAndPassword.password)) {
+            return userIdAndPassword._id.toString();
+        }
+    }
+    return null;
 };
 
 userSchema.statics.findIdByToken = async function (token: string): Promise<string | null> {

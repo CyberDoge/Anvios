@@ -3,6 +3,9 @@ import User, {IUserSchema} from "../model/User";
 import {validateLoginAndPassword} from "../validator/UserCredationalsValidator";
 import InvalidRegCredentialsError from "../error/InvalidRegCredentialsError";
 import {v1 as uuidv1} from 'uuid';
+import {hash} from "bcrypt";
+
+const BCRYPT_SALT_ROUNDS = 12;
 
 export async function regUser({login, password, token}: LoginData): Promise<IUserSchema | null> {
     if (!validateLoginAndPassword(login, password)) {
@@ -12,10 +15,11 @@ export async function regUser({login, password, token}: LoginData): Promise<IUse
         throw new InvalidRegCredentialsError("Login has been already taken")
     }
     try {
+        const hashedPassword = await hash(password, BCRYPT_SALT_ROUNDS);
         if (token) {
-            return await User.findOneAndUpdate({token}, {$set: {login, password}}).lean()
+            return await User.findOneAndUpdate({token}, {$set: {login, password: hashedPassword}}).lean()
         }
-        return await User.create({login, password, token: uuidv1()})
+        return await User.create({login, password: hashedPassword, token: uuidv1()})
     } catch (e) {
         // todo normal log
         console.error(e)
