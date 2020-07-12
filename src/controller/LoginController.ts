@@ -1,6 +1,7 @@
 import LoginData from "../dto/LoginData";
 import SessionModel from "../session/SessionModel";
 import User from "../model/User";
+import PrimaryResponse from "../dto/PrimaryResponse";
 
 export function authUser(loginData: LoginData, session: SessionModel) {
     if (loginData.token) {
@@ -15,7 +16,7 @@ export function authUser(loginData: LoginData, session: SessionModel) {
 
 const setSessionAndSendResponse = (session: SessionModel) => (result: string | null) => {
     session.userId = result;
-    session.socket.send(session.userId ? 200 : 401);
+    session.sendResponse(new PrimaryResponse(null, !!session.userId));
 };
 
 async function authByToken(token: string): Promise<string | null> {

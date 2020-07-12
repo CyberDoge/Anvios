@@ -1,7 +1,7 @@
 import * as mongoose from "mongoose";
 import {Document, Model} from "mongoose";
 
-interface IUserSchema extends Document {
+export interface IUserSchema extends Document {
     token?: String,
     login?: String,
     password?: String
@@ -20,9 +20,16 @@ const userSchema = new mongoose.Schema({
     },
     login: {
         type: String,
-        unique: true
+        unique: true,
+        sparse: true,
+        max: 20,
+        min: 3,
     },
-    password: String
+    password: {
+        type: String,
+        max: 20,
+        min: 45,
+    }
 });
 
 

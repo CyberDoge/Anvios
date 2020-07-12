@@ -3,10 +3,11 @@ import RequestData from "./dto/RequestData";
 import Filter from "./filter/Filter";
 import AuthFilter from "./filter/AuthFilter";
 import SessionModel from "./session/SessionModel";
-import {AUTH, NONE, USER} from "./const/RoutePathConst";
+import {AUTH, NONE, REG_ACCOUNT, REG_ANON, USER} from "./const/RoutePathConst";
 import {sendError, sendErrorMessage} from "./controller/ErrorController";
 import {authUser} from "./controller/LoginController";
 import {sendCurrentUserInfo} from "./controller/UserController";
+import {regAccount, regAnonymous} from "./controller/RegController";
 
 const PORT = +(process.env.port || 8080);
 
@@ -41,6 +42,14 @@ export default class SocketServer {
         switch (request.routePath) {
             case AUTH: {
                 authUser(request.data, session);
+                break;
+            }
+            case REG_ANON: {
+                regAnonymous(session);
+                break;
+            }
+            case REG_ACCOUNT: {
+                regAccount(request.data, session);
                 break;
             }
             case USER: {
