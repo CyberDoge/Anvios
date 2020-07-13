@@ -36,7 +36,7 @@ const userSchema = new mongoose.Schema({
 
 userSchema.statics.findIdByLoginAndPassword = async function (login: string, password: string): Promise<string | null> {
     const userIdAndPassword = await this.findOne({login}).select("_id password").lean();
-    if (userIdAndPassword.password) {
+    if (userIdAndPassword?.password) {
         if (await compare(password, userIdAndPassword.password)) {
             return userIdAndPassword._id.toString();
         }

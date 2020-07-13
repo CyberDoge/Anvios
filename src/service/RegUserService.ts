@@ -5,7 +5,7 @@ import InvalidRegCredentialsError from "../error/InvalidRegCredentialsError";
 import {v1 as uuidv1} from 'uuid';
 import {hash} from "bcrypt";
 
-const BCRYPT_SALT_ROUNDS = 12;
+const BCRYPT_SALT_ROUNDS = +(process.env.bcryptSaltRounds || 2);
 
 export async function regUser({login, password, token}: LoginData): Promise<IUserSchema | null> {
     if (!validateLoginAndPassword(login, password)) {

@@ -185,3 +185,4 @@ fabric.properties
 *.iml
 out
 gen
+!/.env
