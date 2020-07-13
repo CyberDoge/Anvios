@@ -14,25 +14,13 @@ export async function regUser({login, password, token}: LoginData): Promise<IUse
     if (await User.exists({login})) {
         throw new InvalidRegCredentialsError("Login has been already taken")
     }
-    try {
-        const hashedPassword = await hash(password, BCRYPT_SALT_ROUNDS);
-        if (token) {
-            return await User.findOneAndUpdate({token}, {$set: {login, password: hashedPassword}}).lean()
-        }
-        return await User.create({login, password: hashedPassword, token: uuidv1()})
-    } catch (e) {
-        // todo normal log
-        console.error(e)
+    const hashedPassword = await hash(password, BCRYPT_SALT_ROUNDS);
+    if (token) {
+        return User.findOneAndUpdate({token}, {$set: {login, password: hashedPassword}}).lean();
     }
-    return null;
+    return await User.create({login, password: hashedPassword, token: uuidv1()})
 }
 
-export async function regUserAnonymous(): Promise<IUserSchema | null> {
-    try {
-        return await User.create({token: uuidv1()});
-    } catch (e) {
-        // todo normal log
-        console.error(e)
-    }
-    return null
+export async function regUserAnonymous(): Promise<IUserSchema> {
+    return await User.create({token: uuidv1()});
 }

@@ -2,6 +2,7 @@ import LoginData from "../dto/LoginData";
 import SessionModel from "../session/SessionModel";
 import User from "../model/User";
 import PrimaryResponse from "../dto/PrimaryResponse";
+import InvalidDataFormatError from "../error/InvalidDataFormatError";
 
 export function authUser(loginData: LoginData, session: SessionModel) {
     if (loginData.token) {
@@ -9,8 +10,7 @@ export function authUser(loginData: LoginData, session: SessionModel) {
     } else if (loginData.login && loginData.password) {
         authByLoginAndPass(loginData.login, loginData.password).then(setSessionAndSendResponse(session))
     } else {
-        // todo handle invalid data type
-        throw new Error("invalid auth data");
+        throw new InvalidDataFormatError("invalid auth data");
     }
 }
 

@@ -1,8 +1,8 @@
 import CheckedErrorMarker from "./CheckedErrorMarker";
 
-const DEFAULT_MESSAGE = "User not login. Please, authenticate first";
+const DEFAULT_MESSAGE = "Invalid sent data format.";
 
-export default class NotAuthUserError extends Error implements CheckedErrorMarker {
+export default class InvalidDataFormatError extends Error implements CheckedErrorMarker {
     _checkedErrorBrand: never;
 
     constructor(message?: string) {

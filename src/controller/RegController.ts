@@ -4,7 +4,7 @@ import LoginData from "../dto/LoginData";
 import {regUser, regUserAnonymous} from "../service/RegUserService";
 import PrimaryResponse from "../dto/PrimaryResponse";
 import {sendError} from "./ErrorController";
-import InvalidRegCredentialsError from "../error/InvalidRegCredentialsError";
+import InternalServerError from "../error/InternalServerError";
 
 export function regAnonymous(session: SessionModel) {
     regUserAnonymous().then(value => {
@@ -17,17 +17,11 @@ export function regAnonymous(session: SessionModel) {
     });
 }
 
-export function regAccount(loginData: LoginData, session: SessionModel) {
-    regUser(loginData).then(value => {
-        const user = value?.toObject();
-        session.userId = user._id;
-        session.sendResponse(new PrimaryResponse({token: user.token}));
-    }).catch(e => {
-        if (e instanceof InvalidRegCredentialsError) {
-            sendError(e, session);
-        } else {
-            // todo normal log
-            console.error(e)
-        }
-    });
+export async function regAccount(loginData: LoginData, session: SessionModel): Promise<void> {
+    const user = (await regUser(loginData))?.toObject();
+    if (!user) {
+        throw new InternalServerError();
+    }
+    session.userId = user._id;
+    session.sendResponse(new PrimaryResponse({token: user.token}));
 }

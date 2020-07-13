@@ -8,6 +8,8 @@ import {sendError, sendErrorMessage} from "./controller/ErrorController";
 import {authUser} from "./controller/LoginController";
 import {sendCurrentUserInfo} from "./controller/UserController";
 import {regAccount, regAnonymous} from "./controller/RegController";
+import {isCheckedError} from "./error/CheckedErrorMarker";
+import InternalServerError from "./error/InternalServerError";
 
 const PORT = +(process.env.port || 8080);
 
@@ -21,18 +23,28 @@ export default class SocketServer {
         this.filtersChain = [new AuthFilter()]
     }
 
+    private static handleError(error: Error, session: SessionModel): void {
+        if (isCheckedError(error)) {
+            sendError(error, session);
+        } else {
+            // todo normal log
+            console.error(error);
+            sendError(new InternalServerError(), session)
+        }
+    }
+
     start = () => {
         this.server.on("connection", (socket) => {
             const session: SessionModel = new SessionModel(socket);
             socket.on("message", (data: string) => {
-                const request: RequestData = JSON.parse(data);
                 try {
+                    const request: RequestData = JSON.parse(data);
                     for (let filter of this.filtersChain) {
                         filter.doFilter(request.routePath, session)
                     }
                     this.route(request, session)
                 } catch (e) {
-                    sendError(e, session);
+                    SocketServer.handleError(e, session)
                 }
             })
         })
@@ -65,5 +77,5 @@ export default class SocketServer {
                 break;
             }
         }
-    }
+    };
 }
