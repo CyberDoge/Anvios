@@ -2,13 +2,16 @@ import * as mongoose from "mongoose";
 import User from "../src/model/User";
 import {connectToDb} from "../src/db/DbConfig";
 import {expect} from "chai";
+import {hash} from "bcrypt";
+import dotenv from "dotenv";
 
-const OLD_ENV = process.env;
+dotenv.config();
+const BCRYPT_SALT_ROUNDS = +(process.env.bcryptSaltRounds || 2);
 
 async function initUserData() {
     const users = [];
     for (let i = 0; i < 10; i++) {
-        users.push({login: `pupa${i}`, password: `pass${i}`, token: `token${i}`})
+        users.push({login: `pupa${i}`, password: await hash(`pass${i}`, BCRYPT_SALT_ROUNDS), token: `token${i}`})
     }
     await User.insertMany(users)
 }
@@ -27,7 +30,6 @@ afterEach(() => {
     return User.deleteMany({});
 });
 after(() => {
-    process.env = OLD_ENV;
     return mongoose.connections[0].dropDatabase();
 });
 describe('#auth()', function () {

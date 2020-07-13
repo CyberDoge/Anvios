@@ -1,7 +1,8 @@
 import * as mongoose from "mongoose";
 import {Document, Model} from "mongoose";
+import {compare} from "bcrypt";
 
-interface IUserSchema extends Document {
+export interface IUserSchema extends Document {
     token?: String,
     login?: String,
     password?: String
@@ -20,14 +21,27 @@ const userSchema = new mongoose.Schema({
     },
     login: {
         type: String,
-        unique: true
+        unique: true,
+        sparse: true,
+        max: 20,
+        min: 3,
     },
-    password: String
+    password: {
+        type: String,
+        max: 20,
+        min: 45,
+    }
 });
 
 
 userSchema.statics.findIdByLoginAndPassword = async function (login: string, password: string): Promise<string | null> {
-    return (await this.findOne({login, password}).select("_id").lean())?._id.toString() || null
+    const userIdAndPassword = await this.findOne({login}).select("_id password").lean();
+    if (userIdAndPassword?.password) {
+        if (await compare(password, userIdAndPassword.password)) {
+            return userIdAndPassword._id.toString();
+        }
+    }
+    return null;
 };
 
 userSchema.statics.findIdByToken = async function (token: string): Promise<string | null> {

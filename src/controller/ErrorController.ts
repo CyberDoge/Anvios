@@ -1,10 +1,10 @@
 import SessionModel from "../session/SessionModel";
+import PrimaryResponse from "../dto/PrimaryResponse";
 
 export function sendErrorMessage(message: string, session: SessionModel) {
-    session.socket.send(message);
+    session.sendResponse(new PrimaryResponse(null, false, message));
 }
 
 export function sendError(error: Error, session: SessionModel) {
-    session.socket.send(error.message);
-
+    session.sendError(error);
 }
