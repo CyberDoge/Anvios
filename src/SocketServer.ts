@@ -3,13 +3,14 @@ import RequestData from "./dto/RequestData";
 import Filter from "./filter/Filter";
 import AuthFilter from "./filter/AuthFilter";
 import SessionModel from "./session/SessionModel";
-import {AUTH, NONE, REG_ACCOUNT, REG_ANON, USER} from "./const/RoutePathConst";
+import {AUTH, NONE, REG_ACCOUNT, REG_ANON, THEMES, USER} from "./const/RoutePathConst";
 import {sendError, sendErrorMessage} from "./controller/ErrorController";
 import {authUser} from "./controller/LoginController";
 import {sendCurrentUserInfo} from "./controller/UserController";
 import {regAccount, regAnonymous} from "./controller/RegController";
 import {isCheckedError} from "./error/CheckedErrorMarker";
 import InternalServerError from "./error/InternalServerError";
+import {getSomeThemes} from "./controller/ThemeController";
 
 const PORT = +(process.env.port || 8080);
 
@@ -66,6 +67,10 @@ export default class SocketServer {
             }
             case USER: {
                 sendCurrentUserInfo(session);
+                break;
+            }
+            case THEMES: {
+                getSomeThemes(request.data, session);
                 break;
             }
             case NONE: {

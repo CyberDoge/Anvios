@@ -18,7 +18,7 @@ export async function regUser({login, password, token}: LoginData): Promise<IUse
     if (token) {
         return User.findOneAndUpdate({token}, {$set: {login, password: hashedPassword}}).lean();
     }
-    return await User.create({login, password: hashedPassword, token: uuidv1()})
+    return (await User.create({login, password: hashedPassword, token: uuidv1()}))
 }
 
 export async function regUserAnonymous(): Promise<IUserSchema> {

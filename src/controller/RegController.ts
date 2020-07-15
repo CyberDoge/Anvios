@@ -18,7 +18,7 @@ export function regAnonymous(session: SessionModel) {
 }
 
 export async function regAccount(loginData: LoginData, session: SessionModel): Promise<void> {
-    const user = (await regUser(loginData))?.toObject();
+    const user = (await regUser(loginData));
     if (!user) {
         throw new InternalServerError();
     }

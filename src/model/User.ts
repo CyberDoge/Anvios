@@ -49,4 +49,4 @@ userSchema.statics.findIdByToken = async function (token: string): Promise<strin
 };
 
 
-export default mongoose.model<Document, IUserModel>("User", userSchema);
+export default mongoose.model<IUserSchema, IUserModel>("User", userSchema);
