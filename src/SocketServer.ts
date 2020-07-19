@@ -1,16 +1,14 @@
 import ws from 'ws'
-import RequestData from "./dto/RequestData";
+import PrimaryRequest from "./dto/PrimaryRequest";
 import Filter from "./filter/Filter";
 import AuthFilter from "./filter/AuthFilter";
 import SessionModel from "./session/SessionModel";
-import {AUTH, NONE, REG_ACCOUNT, REG_ANON, THEMES, USER} from "./const/RoutePathConst";
-import {sendError, sendErrorMessage} from "./controller/ErrorController";
+import {AUTH, CREATE_THEME, GET_SOME_THEMES, NONE, REG_ACCOUNT, REG_ANON, USER} from "./const/RoutePathConst";
+import {handleAndSendError, sendErrorMessage} from "./controller/ErrorController";
 import {authUser} from "./controller/LoginController";
 import {sendCurrentUserInfo} from "./controller/UserController";
 import {regAccount, regAnonymous} from "./controller/RegController";
-import {isCheckedError} from "./error/CheckedErrorMarker";
-import InternalServerError from "./error/InternalServerError";
-import {getSomeThemes} from "./controller/ThemeController";
+import {createTheme, getSomeThemes} from "./controller/ThemeController";
 
 const PORT = +(process.env.port || 8080);
 
@@ -24,34 +22,24 @@ export default class SocketServer {
         this.filtersChain = [new AuthFilter()]
     }
 
-    private static handleError(error: Error, session: SessionModel): void {
-        if (isCheckedError(error)) {
-            sendError(error, session);
-        } else {
-            // todo normal log
-            console.error(error);
-            sendError(new InternalServerError(), session)
-        }
-    }
-
     start = () => {
         this.server.on("connection", (socket) => {
             const session: SessionModel = new SessionModel(socket);
-            socket.on("message", (data: string) => {
+            socket.on("message", async (data: string) => {
                 try {
-                    const request: RequestData = JSON.parse(data);
+                    const request: PrimaryRequest = JSON.parse(data);
                     for (let filter of this.filtersChain) {
                         filter.doFilter(request.routePath, session)
                     }
-                    this.route(request, session)
+                    await this.route(request, session)
                 } catch (e) {
-                    SocketServer.handleError(e, session)
+                    handleAndSendError(e, session)
                 }
             })
         })
     };
 
-    private route = (request: RequestData, session: SessionModel): void => {
+    private route = async (request: PrimaryRequest, session: SessionModel): Promise<void> => {
         switch (request.routePath) {
             case AUTH: {
                 authUser(request.data, session);
@@ -62,15 +50,19 @@ export default class SocketServer {
                 break;
             }
             case REG_ACCOUNT: {
-                regAccount(request.data, session);
+                await regAccount(request.data, session);
                 break;
             }
             case USER: {
                 sendCurrentUserInfo(session);
                 break;
             }
-            case THEMES: {
+            case GET_SOME_THEMES: {
                 getSomeThemes(request.data, session);
+                break;
+            }
+            case CREATE_THEME: {
+                createTheme(request.data, session);
                 break;
             }
             case NONE: {

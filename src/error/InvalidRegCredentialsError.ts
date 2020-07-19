@@ -1,9 +1,5 @@
-import CheckedErrorMarker from "./CheckedErrorMarker";
+import checkedErrorMarker from "./CheckedErrorMarker";
 
-export default class InvalidRegCredentialsError extends Error implements CheckedErrorMarker {
-    _checkedErrorBrand: never;
-
-    constructor(message: string) {
-        super(message);
-    }
+@checkedErrorMarker
+export default class InvalidRegCredentialsError extends Error {
 }

@@ -1,4 +1,4 @@
-export default class RequestData {
+export default class PrimaryRequest {
     routePath: string = "none";
     data: any;
 }

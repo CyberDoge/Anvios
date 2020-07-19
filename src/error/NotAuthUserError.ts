@@ -1,10 +1,9 @@
-import CheckedErrorMarker from "./CheckedErrorMarker";
+import checkedErrorMarker from "./CheckedErrorMarker";
 
 const DEFAULT_MESSAGE = "User not login. Please, authenticate first";
 
-export default class NotAuthUserError extends Error implements CheckedErrorMarker {
-    _checkedErrorBrand: never;
-
+@checkedErrorMarker
+export default class NotAuthUserError extends Error {
     constructor(message?: string) {
         super(message || DEFAULT_MESSAGE);
     }

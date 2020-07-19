@@ -1,10 +1,9 @@
-import CheckedErrorMarker from "./CheckedErrorMarker";
+import checkedErrorMarker from "./CheckedErrorMarker";
 
 const DEFAULT_MESSAGE = "Invalid sent data format.";
 
-export default class InvalidDataFormatError extends Error implements CheckedErrorMarker {
-    _checkedErrorBrand: never;
-
+@checkedErrorMarker
+export default class InvalidDataFormatError extends Error {
     constructor(message?: string) {
         super(message || DEFAULT_MESSAGE);
     }

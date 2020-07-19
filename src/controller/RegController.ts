@@ -1,6 +1,6 @@
 import SessionModel from "../session/SessionModel";
 
-import LoginData from "../dto/LoginData";
+import LoginRequest from "../dto/LoginRequest";
 import {regUser, regUserAnonymous} from "../service/RegUserService";
 import PrimaryResponse from "../dto/PrimaryResponse";
 import {sendError} from "./ErrorController";
@@ -17,7 +17,7 @@ export function regAnonymous(session: SessionModel) {
     });
 }
 
-export async function regAccount(loginData: LoginData, session: SessionModel): Promise<void> {
+export async function regAccount(loginData: LoginRequest, session: SessionModel): Promise<void> {
     const user = (await regUser(loginData));
     if (!user) {
         throw new InternalServerError();

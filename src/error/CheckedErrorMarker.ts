@@ -1,7 +1,7 @@
-export default interface CheckedErrorMarker {
-    _checkedErrorBrand: never;
+export default function checkedErrorMarker<T extends { new(message?: string): {} }>(constructor: T) {
+    constructor.prototype._isCheckedErrorBrand = true
 }
 
-export function isCheckedError(error: Error | CheckedErrorMarker): error is CheckedErrorMarker & Error {
-    return '_checkedErrorBrand' in error
+export function isCheckedError(error: Error): boolean {
+    return '_isCheckedErrorBrand' in error && error['_isCheckedErrorBrand']
 }
