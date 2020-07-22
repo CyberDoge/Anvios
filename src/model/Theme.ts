@@ -30,7 +30,8 @@ themeSchema.statics.getSomeSortedByDateThemes = async function (from: number, co
     if (count > 20) {
         count = 20;
     }
-    return this.find({}).sort("-data").skip(from).limit(count).lean()
+    // todo autocast json object field from string to int
+    return await this.find({}).sort("-data").skip(+from).limit(+count).exec()
 };
 
 themeSchema.statics.createTheme = async function (theme: NewThemeRequest): Promise<IThemeSchema> {
