@@ -29,7 +29,7 @@ export default class SocketServer {
                 try {
                     const request: PrimaryRequest = JSON.parse(data);
                     for (let filter of this.filtersChain) {
-                        filter.doFilter(request.routePath, session)
+                        await filter.doFilter(request.routePath, session)
                     }
                     await this.route(request, session)
                 } catch (e) {
