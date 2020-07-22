@@ -17,11 +17,11 @@ export default class SessionModel {
         this.socket.send(JSON.stringify(response))
     };
 
-    sendError = (error: Error) => {
-        this.sendResponse(new PrimaryResponse(null, false, error.message))
+    sendError = (error: Error, requestId: string,) => {
+        this.sendResponse(new PrimaryResponse(null, requestId, error.message))
     };
 
-    sendMessage = (message: string) => {
-        this.sendResponse(new PrimaryResponse({message}))
+    sendMessage = (message: string, requestId: string) => {
+        this.sendResponse(new PrimaryResponse({message}, requestId))
     }
 }

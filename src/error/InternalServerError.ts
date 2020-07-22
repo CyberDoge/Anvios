@@ -1,9 +1,9 @@
-import CheckedErrorMarker from "./CheckedErrorMarker";
+import checkedErrorMarker from "./CheckedErrorMarker";
 
-const DEFAULT_MESSAGE = "User not login. Please, authenticate first";
+const DEFAULT_MESSAGE = "Some thing gone wrong";
 
-export default class InternalServerError extends Error implements CheckedErrorMarker {
-    _checkedErrorBrand: never;
+@checkedErrorMarker
+export default class InternalServerError extends Error {
 
     constructor(message?: string) {
         super(message || DEFAULT_MESSAGE);
