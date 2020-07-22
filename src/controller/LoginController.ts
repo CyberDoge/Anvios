@@ -3,20 +3,21 @@ import SessionModel from "../session/SessionModel";
 import User from "../model/User";
 import PrimaryResponse from "../dto/PrimaryResponse";
 import InvalidDataFormatError from "../error/InvalidDataFormatError";
+import PrimaryRequest from "../dto/PrimaryRequest";
 
-export function authUser(loginData: LoginRequest, session: SessionModel) {
-    if (loginData.token) {
-        authByToken(loginData.token).then(setSessionAndSendResponse(session));
-    } else if (loginData.login && loginData.password) {
-        authByLoginAndPass(loginData.login, loginData.password).then(setSessionAndSendResponse(session))
+export function authUser({data, requestId}: PrimaryRequest<LoginRequest>, session: SessionModel) {
+    if (data.token) {
+        authByToken(data.token).then(setSessionAndSendResponse(session, requestId));
+    } else if (data.login && data.password) {
+        authByLoginAndPass(data.login, data.password).then(setSessionAndSendResponse(session, requestId))
     } else {
         throw new InvalidDataFormatError("invalid auth data");
     }
 }
 
-const setSessionAndSendResponse = (session: SessionModel) => (result: string | null) => {
+const setSessionAndSendResponse = (session: SessionModel, requestId: string) => (result: string | null) => {
     session.userId = result;
-    session.sendResponse(new PrimaryResponse(null, !!session.userId));
+    session.sendResponse(new PrimaryResponse(null, requestId));
 };
 
 async function authByToken(token: string): Promise<string | null> {

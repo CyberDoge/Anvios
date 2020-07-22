@@ -1,4 +1,5 @@
-export default class PrimaryRequest {
-    routePath: string = "none";
-    data: any;
+export default interface PrimaryRequest<T> {
+    routePath: string;
+    requestId: string;
+    data: T;
 }

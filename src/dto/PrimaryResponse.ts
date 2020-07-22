@@ -1,11 +1,11 @@
 export default class PrimaryResponse {
     data: any;
-    successfully: boolean;
-    reason?: string;
+    error?: string | object;
+    requestId: string;
 
-    constructor(data: any, successfully: boolean = true, reason?: string) {
+    constructor(data: any, requestId: string, error?: string | object) {
         this.data = data;
-        this.successfully = successfully;
-        this.reason = reason;
+        this.requestId = requestId;
+        this.error = error;
     }
 }
