@@ -21,8 +21,9 @@ export function getSomeThemes(request: PrimaryRequest<SomeThemesRequest>, sessio
 }
 
 export function createTheme(request: PrimaryRequest<NewThemeRequest>, session: SessionModel) {
-    if (validateNewTheme(request.data)) {
-        session.sendError(new Error("invalid theme fields"), request.requestId)
+    if (!validateNewTheme(request.data)) {
+        session.sendError(new Error("invalid theme fields"), request.requestId);
+        return;
     }
     Theme.createTheme(request.data).then(() => {
         session.sendMessage("success", request.requestId)
