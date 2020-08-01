@@ -1,7 +1,6 @@
 import LoginRequest from "../dto/LoginRequest";
 import SessionModel from "../session/SessionModel";
 import User from "../model/User";
-import PrimaryResponse from "../dto/PrimaryResponse";
 import InvalidDataFormatError from "../error/InvalidDataFormatError";
 import PrimaryRequest from "../dto/PrimaryRequest";
 
@@ -17,7 +16,11 @@ export function authUser({data, requestId}: PrimaryRequest<LoginRequest>, sessio
 
 const setSessionAndSendResponse = (session: SessionModel, requestId: string) => (result: string | null) => {
     session.userId = result;
-    session.sendResponse(new PrimaryResponse(null, requestId));
+    if (session.userId) {
+        session.sendMessage("success", requestId);
+    } else {
+        session.sendMessage("failed", requestId);
+    }
 };
 
 async function authByToken(token: string): Promise<string | null> {

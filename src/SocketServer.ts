@@ -3,12 +3,12 @@ import PrimaryRequest from "./dto/PrimaryRequest";
 import Filter from "./filter/Filter";
 import AuthFilter from "./filter/AuthFilter";
 import SessionModel from "./session/SessionModel";
-import {AUTH, CREATE_THEME, GET_SOME_THEMES, REG_ACCOUNT, REG_ANON, USER} from "./const/RoutePathConst";
+import {AUTH, CREATE_THEME, GET_SOME_THEMES, REG_ACCOUNT, REG_ANON, USER, VOTE_TO_THEME} from "./const/RoutePathConst";
 import {handleAndSendError, sendErrorMessage} from "./controller/ErrorController";
 import {authUser} from "./controller/LoginController";
 import {sendCurrentUserInfo} from "./controller/UserController";
 import {regAccount, regAnonymous} from "./controller/RegController";
-import {createTheme, getSomeThemes} from "./controller/ThemeController";
+import {createTheme, getSomeThemes, voteToTheme} from "./controller/ThemeController";
 
 const PORT = +(process.env.port || 8080);
 
@@ -63,6 +63,10 @@ export default class SocketServer {
             }
             case CREATE_THEME: {
                 createTheme(request, session);
+                break;
+            }
+            case VOTE_TO_THEME: {
+                voteToTheme(request, session);
                 break;
             }
             default: {
