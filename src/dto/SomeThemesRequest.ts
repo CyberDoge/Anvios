@@ -1,4 +1,4 @@
 export default interface SomeThemesRequest {
-    from: number
-    count: number
+    from?: number
+    count?: number
 }

@@ -3,6 +3,7 @@ import {Document, Model, Schema} from "mongoose";
 import NewThemeRequest from "../dto/NewThemeRequest";
 import {IUserSchema} from "./User";
 import {changeUserVoteOnTheme} from "../service/themeService/ThemeService";
+import InvalidThemeDataError from "../error/InvalidThemeDataError";
 
 
 export interface IThemeSchema extends Document {
@@ -17,7 +18,7 @@ export interface IThemeSchema extends Document {
 interface IThemeModel extends Model<IThemeSchema> {
     getSomeSortedByDateThemes(from: number, count: number): Promise<Array<IThemeSchema>>,
 
-    voteToTheme(themeId: string, userId: string, agree: boolean): Promise<IThemeSchema | null>,
+    voteToTheme(themeId: string, agree: boolean, userId: string): Promise<IThemeSchema | never>,
 
     createTheme(theme: NewThemeRequest): Promise<IThemeSchema>;
 }
@@ -53,12 +54,12 @@ themeSchema.statics.createTheme = async function (theme: NewThemeRequest): Promi
     return Theme.create(dbTheme)
 };
 
-themeSchema.statics.voteToTheme = async function (themeId: string, userId: string, agree: boolean): Promise<IThemeSchema | null> {
+themeSchema.statics.voteToTheme = async function (themeId: string, agree: boolean, userId: string): Promise<IThemeSchema | never> {
     const theme = await Theme.findById(themeId);
     if (!theme) {
-        return null;
+        throw new InvalidThemeDataError("no theme with such id");
     }
-    changeUserVoteOnTheme(theme, false, "");
+    changeUserVoteOnTheme(theme, agree, userId);
 
     return theme.save();
 };

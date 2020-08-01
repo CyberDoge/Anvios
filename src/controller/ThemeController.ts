@@ -9,7 +9,7 @@ import ThemeData from "../dto/ThemeData";
 import VoteToThemeRequest from "../dto/VoteToThemeRequest";
 
 export function getSomeThemes(request: PrimaryRequest<SomeThemesRequest>, session: SessionModel): void {
-    Theme.getSomeSortedByDateThemes(request.data.from, request.data.count).then((themes) => {
+    Theme.getSomeSortedByDateThemes(request.data?.from || 0, request.data?.count || 0).then((themes) => {
         const themesRequest: Array<ThemeData> = themes.map(themeSchema => (
             {
                 id: themeSchema._id,
@@ -32,11 +32,9 @@ export function createTheme(request: PrimaryRequest<NewThemeRequest>, session: S
 }
 
 export function voteToTheme(request: PrimaryRequest<VoteToThemeRequest>, session: SessionModel) {
-    Theme.voteToTheme(request.data.themeId, session.userId!, request.data.agree).then((theme) => {
-        if (theme) {
-            session.sendResponse(new PrimaryResponse({themeId: theme._id}, request.requestId))
-        } else {
-            session.sendResponse(new PrimaryResponse({}, request.requestId, "no such theme"))
-        }
+    Theme.voteToTheme(request.data.themeId, request.data.agree, session.userId!).then((theme) => {
+        session.sendResponse(new PrimaryResponse({themeId: theme._id}, request.requestId))
+    }).catch(reason => {
+        session.sendError(reason, request.requestId);
     })
 }

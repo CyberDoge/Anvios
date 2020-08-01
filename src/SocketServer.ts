@@ -25,18 +25,24 @@ export default class SocketServer {
     start = () => {
         this.server.on("connection", (socket) => {
             const session: SessionModel = new SessionModel(socket);
-            socket.on("message", async (data: string) => {
-                const request: PrimaryRequest<any> = JSON.parse(data);
-                try {
-                    for (let filter of this.filtersChain) {
-                        await filter.doFilter(request.routePath, session)
-                    }
-                    await this.route(request, session)
-                } catch (e) {
-                    handleAndSendError(e, request.requestId, session)
+            socket.on("message", this.handleUserMessage(session, socket))
+        });
+    };
+
+    private handleUserMessage = (session: SessionModel, socket: ws) => async (data: string) => {
+        try {
+            const request: PrimaryRequest<any> = JSON.parse(data);
+            try {
+                for (let filter of this.filtersChain) {
+                    await filter.doFilter(request.routePath, session)
                 }
-            })
-        })
+                await this.route(request, session)
+            } catch (e) {
+                handleAndSendError(e, request.requestId, session)
+            }
+        } catch (e) {
+            socket.send("invalid JSON syntax")
+        }
     };
 
     private route = async (request: PrimaryRequest<any>, session: SessionModel): Promise<void> => {
@@ -75,4 +81,4 @@ export default class SocketServer {
             }
         }
     };
-}
+};
