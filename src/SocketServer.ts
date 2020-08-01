@@ -3,12 +3,12 @@ import PrimaryRequest from "./dto/PrimaryRequest";
 import Filter from "./filter/Filter";
 import AuthFilter from "./filter/AuthFilter";
 import SessionModel from "./session/SessionModel";
-import {AUTH, CREATE_THEME, GET_SOME_THEMES, REG_ACCOUNT, REG_ANON, USER} from "./const/RoutePathConst";
+import {AUTH, CREATE_THEME, GET_SOME_THEMES, REG_ACCOUNT, REG_ANON, USER, VOTE_TO_THEME} from "./const/RoutePathConst";
 import {handleAndSendError, sendErrorMessage} from "./controller/ErrorController";
 import {authUser} from "./controller/LoginController";
 import {sendCurrentUserInfo} from "./controller/UserController";
 import {regAccount, regAnonymous} from "./controller/RegController";
-import {createTheme, getSomeThemes} from "./controller/ThemeController";
+import {createTheme, getSomeThemes, voteToTheme} from "./controller/ThemeController";
 
 const PORT = +(process.env.port || 8080);
 
@@ -25,18 +25,24 @@ export default class SocketServer {
     start = () => {
         this.server.on("connection", (socket) => {
             const session: SessionModel = new SessionModel(socket);
-            socket.on("message", async (data: string) => {
-                const request: PrimaryRequest<any> = JSON.parse(data);
-                try {
-                    for (let filter of this.filtersChain) {
-                        await filter.doFilter(request.routePath, session)
-                    }
-                    await this.route(request, session)
-                } catch (e) {
-                    handleAndSendError(e, request.requestId, session)
+            socket.on("message", this.handleUserMessage(session, socket))
+        });
+    };
+
+    private handleUserMessage = (session: SessionModel, socket: ws) => async (data: string) => {
+        try {
+            const request: PrimaryRequest<any> = JSON.parse(data);
+            try {
+                for (let filter of this.filtersChain) {
+                    await filter.doFilter(request.routePath, session)
                 }
-            })
-        })
+                await this.route(request, session)
+            } catch (e) {
+                handleAndSendError(e, request.requestId, session)
+            }
+        } catch (e) {
+            socket.send("invalid JSON syntax")
+        }
     };
 
     private route = async (request: PrimaryRequest<any>, session: SessionModel): Promise<void> => {
@@ -65,10 +71,14 @@ export default class SocketServer {
                 createTheme(request, session);
                 break;
             }
+            case VOTE_TO_THEME: {
+                voteToTheme(request, session);
+                break;
+            }
             default: {
                 sendErrorMessage("no such path", request.requestId, session);
                 break;
             }
         }
     };
-}
+};

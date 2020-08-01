@@ -1,15 +1,24 @@
 import * as mongoose from "mongoose";
 import {Document, Model, Schema} from "mongoose";
 import NewThemeRequest from "../dto/NewThemeRequest";
+import {IUserSchema} from "./User";
+import {changeUserVoteOnTheme} from "../service/themeService/ThemeService";
+import InvalidThemeDataError from "../error/InvalidThemeDataError";
 
 
 export interface IThemeSchema extends Document {
     title: string;
     description?: string;
+    date: Date,
+    votedUpIds: Array<IUserSchema["_id"]>,
+    votedDownIds: Array<IUserSchema["_id"]>,
+    winnerId?: Schema.Types.ObjectId
 }
 
 interface IThemeModel extends Model<IThemeSchema> {
     getSomeSortedByDateThemes(from: number, count: number): Promise<Array<IThemeSchema>>,
+
+    voteToTheme(themeId: string, agree: boolean, userId: string): Promise<IThemeSchema | never>,
 
     createTheme(theme: NewThemeRequest): Promise<IThemeSchema>;
 }
@@ -30,7 +39,7 @@ themeSchema.statics.getSomeSortedByDateThemes = async function (from: number, co
     if (count > 20) {
         count = 20;
     }
-    // todo autocast json object field from string to int
+    new Set<string>();
     return await this.find({}).sort("-data").skip(+from).limit(+count).exec()
 };
 
@@ -41,11 +50,18 @@ themeSchema.statics.createTheme = async function (theme: NewThemeRequest): Promi
         date: new Date(),
         votedUpIds: [],
         votedDownIds: [],
-        winnerId: null
-
-
     };
     return Theme.create(dbTheme)
+};
+
+themeSchema.statics.voteToTheme = async function (themeId: string, agree: boolean, userId: string): Promise<IThemeSchema | never> {
+    const theme = await Theme.findById(themeId);
+    if (!theme) {
+        throw new InvalidThemeDataError("no theme with such id");
+    }
+    changeUserVoteOnTheme(theme, agree, userId);
+
+    return theme.save();
 };
 
 const Theme = mongoose.model<IThemeSchema, IThemeModel>('Theme', themeSchema);
