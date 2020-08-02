@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import logger from "../config/WinstonLogger";
 
 export function connectToDb() {
     const DATABASE = process.env.database;
@@ -12,10 +13,10 @@ export function connectToDb() {
     });
     const db = mongoose.connection;
     db.on('error', (e) => {
-        console.error('connection error:', e);
+        logger.error("connected to database error:");
         process.exit(1);
     });
     db.once('open', () => {
-        console.log("connected")
+        logger.debug("connected to database")
     });
 }

@@ -2,6 +2,7 @@ import SessionModel from "../session/SessionModel";
 import PrimaryResponse from "../dto/PrimaryResponse";
 import {isCheckedError} from "../error/CheckedErrorMarker";
 import InternalServerError from "../error/InternalServerError";
+import logger from "../config/WinstonLogger";
 
 export function sendErrorMessage(message: string, requestId: string, session: SessionModel) {
     session.sendResponse(new PrimaryResponse(null, requestId, message));
@@ -15,8 +16,7 @@ export function handleAndSendError(error: Error, requestId: string, session: Ses
     if (isCheckedError(error)) {
         sendError(error, requestId, session);
     } else {
-        // todo normal log
-        console.error(error);
+        logger.error(error);
         sendError(new InternalServerError(), requestId, session)
     }
 }

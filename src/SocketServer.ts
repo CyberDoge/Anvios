@@ -33,6 +33,7 @@ export default class SocketServer {
         try {
             const request: PrimaryRequest<any> = JSON.parse(data);
             try {
+                throw new Error("foo");
                 for (let filter of this.filtersChain) {
                     await filter.doFilter(request.routePath, session)
                 }
