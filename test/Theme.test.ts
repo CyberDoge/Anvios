@@ -1,4 +1,4 @@
-import {ThemeBase} from "../src/service/themeService/ThemeService.types";
+import {ThemeBase} from "../src/service/themeService/types/ThemeService.types";
 import {changeUserVoteOnTheme} from "../src/service/themeService/ThemeService";
 import {expect} from "chai";
 
@@ -8,7 +8,6 @@ beforeEach(() => {
         themes.push({
             title: `title${i}`,
             description: `description${i}`,
-            date: new Date(i * 10000),
             votedUpIds: ["first", "second", "third"],
             votedDownIds: ["notFirst", "notSecond", "notThird"],
         })

@@ -9,17 +9,21 @@ import {authUser} from "./controller/LoginController";
 import {sendCurrentUserInfo} from "./controller/UserController";
 import {regAccount, regAnonymous} from "./controller/RegController";
 import {createTheme, getSomeThemes, voteToTheme} from "./controller/ThemeController";
+import Ajv from 'ajv';
+import {SomeThemeRequest} from "./dto/schema/SomeThemesRequest.schema";
 
 const PORT = +(process.env.port || 8080);
 
 export default class SocketServer {
     private server: ws.Server;
+    private ajv: Ajv.Ajv;
 
     private readonly filtersChain: Filter[];
 
     constructor() {
         this.server = new ws.Server({port: PORT});
-        this.filtersChain = [new AuthFilter()]
+        this.ajv = new Ajv({allErrors: true});
+        this.filtersChain = [new AuthFilter()];
     }
 
     start = () => {
@@ -33,7 +37,8 @@ export default class SocketServer {
         try {
             const request: PrimaryRequest<any> = JSON.parse(data);
             try {
-                throw new Error("foo");
+                // todo fix all import adding index.ts & add validate json filter
+                console.log(this.ajv.validate(SomeThemeRequest, request.data));
                 for (let filter of this.filtersChain) {
                     await filter.doFilter(request.routePath, session)
                 }
@@ -47,6 +52,7 @@ export default class SocketServer {
     };
 
     private route = async (request: PrimaryRequest<any>, session: SessionModel): Promise<void> => {
+
         switch (request.routePath) {
             case AUTH: {
                 authUser(request, session);

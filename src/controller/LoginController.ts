@@ -1,10 +1,10 @@
-import LoginRequest from "../dto/LoginRequest";
+import AuthRequest from "../dto/types/AuthRequest";
 import SessionModel from "../session/SessionModel";
 import User from "../model/User";
 import InvalidDataFormatError from "../error/InvalidDataFormatError";
 import PrimaryRequest from "../dto/PrimaryRequest";
 
-export function authUser({data, requestId}: PrimaryRequest<LoginRequest>, session: SessionModel) {
+export function authUser({data, requestId}: PrimaryRequest<AuthRequest>, session: SessionModel) {
     if (data.token) {
         authByToken(data.token).then(setSessionAndSendResponse(session, requestId));
     } else if (data.login && data.password) {

@@ -1,4 +1,4 @@
-import {ThemeBase} from "./ThemeService.types";
+import {ThemeBase} from "./types/ThemeService.types";
 
 export function changeUserVoteOnTheme(theme: ThemeBase, agree: boolean, userId: string): ThemeBase {
     const agreedUserIndex = theme.votedUpIds.indexOf(userId);
@@ -18,4 +18,26 @@ export function changeUserVoteOnTheme(theme: ThemeBase, agree: boolean, userId: 
         theme.votedDownIds.push(userId)
     }
     return theme;
+}
+
+function isOnline(user: any): boolean {
+    return false
+}
+
+export function getThemeReadyForChat(theme: ThemeBase): boolean {
+    if (!theme.votedDownIds.length || !theme.votedUpIds.length) {
+        return false;
+    }
+    let firstPlayer = null;
+    let secondPlayer = null;
+    firstPlayer = theme.votedUpIds.find(upUserId => {
+        if (!isOnline(upUserId)) {
+            return false;
+        }
+        secondPlayer = theme.votedDownIds.find(downUserId => {
+            return isOnline(downUserId);
+        });
+        return secondPlayer;
+    });
+    return firstPlayer;
 }

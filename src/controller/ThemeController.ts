@@ -1,15 +1,15 @@
 import Theme from "../model/Theme";
 import SessionModel from "../session/SessionModel";
 import PrimaryResponse from "../dto/PrimaryResponse";
-import SomeThemesRequest from "../dto/SomeThemesRequest";
-import NewThemeRequest from "../dto/NewThemeRequest";
+import SomeThemesRequest from "../dto/types/SomeThemesRequest";
+import NewThemeRequest from "../dto/types/NewThemeRequest";
 import {validateNewTheme} from "../validator/ThemeValidator";
 import PrimaryRequest from "../dto/PrimaryRequest";
-import ThemeData from "../dto/ThemeData";
-import VoteToThemeRequest from "../dto/VoteToThemeRequest";
+import ThemeData from "../dto/types/ThemeData";
+import VoteToThemeRequest from "../dto/types/VoteToThemeRequest";
 
 export function getSomeThemes(request: PrimaryRequest<SomeThemesRequest>, session: SessionModel): void {
-    Theme.getSomeSortedByDateThemes(request.data?.from || 0, request.data?.count || 0).then((themes) => {
+    Theme.getSomeSortedByDateThemes(request.data.from, request.data.count || 0).then((themes) => {
         const themesRequest: Array<ThemeData> = themes.map(themeSchema => (
             {
                 id: themeSchema._id,

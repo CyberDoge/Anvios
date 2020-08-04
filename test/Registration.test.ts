@@ -2,7 +2,7 @@ import User from "../src/model/User";
 import {connectToDb} from "../src/db/DbConfig";
 import * as mongoose from "mongoose";
 import {expect} from "chai";
-import {regUser, regUserAnonymous} from "../src/service/RegUserService";
+import {regUser, regUserAnonymous} from "../src/service/userService/RegUserService";
 
 import dotenv from "dotenv";
 
