@@ -1,5 +1,5 @@
 import {MAX_THEME_DESCRIPTION_LENGTH, MAX_THEME_TITLE_LENGTH} from "../const/ModelConst";
-import NewThemeRequest from "../dto/types/NewThemeRequest";
+import NewThemeRequest from "../dto/types/NewThemeRequest/NewThemeRequest";
 
 
 export function validateNewTheme(theme: NewThemeRequest): boolean {

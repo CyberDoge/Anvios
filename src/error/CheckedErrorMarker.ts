@@ -1,4 +1,4 @@
-export default function checkedErrorMarker<T extends { new(message?: string): {} }>(constructor: T) {
+export function checkedErrorMarker<T extends { new(message?: string): {} }>(constructor: T) {
     constructor.prototype._isCheckedErrorBrand = true
 }
 

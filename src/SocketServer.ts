@@ -1,17 +1,24 @@
 import ws from 'ws'
 import PrimaryRequest from "./dto/PrimaryRequest";
-import Filter from "./filter/Filter";
-import AuthFilter from "./filter/AuthFilter";
 import SessionModel from "./session/SessionModel";
-import {AUTH, CREATE_THEME, GET_SOME_THEMES, REG_ACCOUNT, REG_ANON, USER, VOTE_TO_THEME} from "./const/RoutePathConst";
+import {
+    CREATE_THEME,
+    CREDENTIAL_AUTH,
+    GET_SOME_THEMES,
+    REG_ACCOUNT,
+    REG_ANON,
+    TOKEN_AUTH,
+    USER,
+    VOTE_TO_THEME
+} from "./const/RoutePathConst";
 import {handleAndSendError, sendErrorMessage} from "./controller/ErrorController";
-import {authUser} from "./controller/LoginController";
+import {authUser, tokenAuthUser} from "./controller/LoginController";
 import {sendCurrentUserInfo} from "./controller/UserController";
 import {regAccount, regAnonymous} from "./controller/RegController";
 import {createTheme, getSomeThemes, voteToTheme} from "./controller/ThemeController";
 import Ajv from 'ajv';
-import {SomeThemeRequest} from "./dto/schema/SomeThemesRequest.schema";
 import SessionStorage from "./storage/SessionStorage";
+import {AuthFilter, Filter} from "./filter";
 
 const PORT = +(process.env.port || 8080);
 
@@ -42,7 +49,6 @@ export default class SocketServer {
             const request: PrimaryRequest<any> = JSON.parse(data);
             try {
                 // todo fix all import adding index.ts & add validate json filter
-                console.log(this.ajv.validate(SomeThemeRequest, request.data));
                 for (let filter of this.filtersChain) {
                     await filter.doFilter(request.routePath, session)
                 }
@@ -58,8 +64,12 @@ export default class SocketServer {
     private route = async (request: PrimaryRequest<any>, session: SessionModel): Promise<void> => {
 
         switch (request.routePath) {
-            case AUTH: {
+            case CREDENTIAL_AUTH: {
                 authUser(request, session);
+                break;
+            }
+            case TOKEN_AUTH: {
+                tokenAuthUser(request, session);
                 break;
             }
             case REG_ANON: {

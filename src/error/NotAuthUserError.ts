@@ -1,4 +1,4 @@
-import checkedErrorMarker from "./CheckedErrorMarker";
+import {checkedErrorMarker} from "./CheckedErrorMarker";
 
 const DEFAULT_MESSAGE = "User not login. Please, authenticate first";
 

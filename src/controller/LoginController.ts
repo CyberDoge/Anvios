@@ -1,17 +1,15 @@
-import AuthRequest from "../dto/types/AuthRequest";
 import SessionModel from "../session/SessionModel";
 import User from "../model/User";
-import InvalidDataFormatError from "../error/InvalidDataFormatError";
 import PrimaryRequest from "../dto/PrimaryRequest";
+import {CredentialsAuthRequest} from "../dto/types/CredentialsAuthRequest";
+import {TokenAuthRequest} from "../dto/types/TokenAuthRequest";
 
-export function authUser({data, requestId}: PrimaryRequest<AuthRequest>, session: SessionModel) {
-    if (data.token) {
-        authByToken(data.token).then(setSessionAndSendResponse(session, requestId));
-    } else if (data.login && data.password) {
-        authByLoginAndPass(data.login, data.password).then(setSessionAndSendResponse(session, requestId))
-    } else {
-        throw new InvalidDataFormatError("invalid auth data");
-    }
+export function authUser({data, requestId}: PrimaryRequest<CredentialsAuthRequest>, session: SessionModel) {
+    authByLoginAndPass(data.login, data.password).then(setSessionAndSendResponse(session, requestId))
+}
+
+export function tokenAuthUser({data, requestId}: PrimaryRequest<TokenAuthRequest>, session: SessionModel) {
+    authByToken(data.token).then(setSessionAndSendResponse(session, requestId));
 }
 
 const setSessionAndSendResponse = (session: SessionModel, requestId: string) => (result: string | null) => {

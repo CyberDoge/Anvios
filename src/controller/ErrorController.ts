@@ -1,6 +1,6 @@
 import SessionModel from "../session/SessionModel";
 import PrimaryResponse from "../dto/PrimaryResponse";
-import {isCheckedError} from "../error/CheckedErrorMarker";
+import {isCheckedError} from "../error";
 import InternalServerError from "../error/InternalServerError";
 import logger from "../config/WinstonLogger";
 

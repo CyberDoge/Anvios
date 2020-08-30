@@ -1,4 +1,4 @@
-export const SomeThemeRequest = {
+export const SomeThemesRequest = {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "properties": {
         "count": {

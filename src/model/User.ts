@@ -3,9 +3,9 @@ import {Document, Model} from "mongoose";
 import {compare} from "bcrypt";
 
 export interface IUserSchema extends Document {
-    token?: String,
-    login?: String,
-    password?: String
+    token: string,
+    login?: string,
+    password?: string
 }
 
 interface IUserModel extends Model<IUserSchema> {

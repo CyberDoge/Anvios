@@ -1,5 +1,6 @@
 // normal url parsing
-export const AUTH = "auth";
+export const CREDENTIAL_AUTH = "credential_auth";
+export const TOKEN_AUTH = "token_auth";
 export const REG_ANON = "reg_anonymous";
 export const REG_ACCOUNT = "reg_account";
 export const USER = "user";

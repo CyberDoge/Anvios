@@ -1,12 +1,12 @@
 import Theme from "../model/Theme";
 import SessionModel from "../session/SessionModel";
 import PrimaryResponse from "../dto/PrimaryResponse";
-import SomeThemesRequest from "../dto/types/SomeThemesRequest";
-import NewThemeRequest from "../dto/types/NewThemeRequest";
+import NewThemeRequest from "../dto/types/NewThemeRequest/NewThemeRequest";
 import {validateNewTheme} from "../validator/ThemeValidator";
 import PrimaryRequest from "../dto/PrimaryRequest";
-import ThemeData from "../dto/types/ThemeData";
-import VoteToThemeRequest from "../dto/types/VoteToThemeRequest";
+import {VoteToThemeRequest} from "../dto/types/VoteToThemeRequest";
+import {SomeThemesRequest} from "../dto/types/SomeThemeRequest";
+import {ThemeData} from "../dto/types/ThemeData";
 
 export function getSomeThemes(request: PrimaryRequest<SomeThemesRequest>, session: SessionModel): void {
     Theme.getSomeSortedByDateThemes(request.data.from, request.data.count || 0).then((themes) => {

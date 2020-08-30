@@ -1,4 +1,4 @@
-import AuthRequest from "../../dto/types/AuthRequest";
+import AuthRequest from "../../dto/types/CredentialsAuthRequest/CredentialsAuthRequest";
 import User, {IUserSchema} from "../../model/User";
 import {validateLoginAndPassword} from "../../validator/UserCredationalsValidator";
 import InvalidRegCredentialsError from "../../error/InvalidRegCredentialsError";

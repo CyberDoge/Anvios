@@ -1,4 +1,4 @@
-import checkedErrorMarker from "./CheckedErrorMarker";
+import {checkedErrorMarker} from "./CheckedErrorMarker";
 
 const DEFAULT_MESSAGE = "Invalid sent data format.";
 
