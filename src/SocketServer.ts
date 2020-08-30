@@ -11,24 +11,28 @@ import {regAccount, regAnonymous} from "./controller/RegController";
 import {createTheme, getSomeThemes, voteToTheme} from "./controller/ThemeController";
 import Ajv from 'ajv';
 import {SomeThemeRequest} from "./dto/schema/SomeThemesRequest.schema";
+import SessionStorage from "./storage/SessionStorage";
 
 const PORT = +(process.env.port || 8080);
 
 export default class SocketServer {
     private server: ws.Server;
     private ajv: Ajv.Ajv;
+    private sessionStorage: SessionStorage;
 
     private readonly filtersChain: Filter[];
 
     constructor() {
         this.server = new ws.Server({port: PORT});
+        this.sessionStorage = new SessionStorage();
         this.ajv = new Ajv({allErrors: true});
         this.filtersChain = [new AuthFilter()];
     }
 
     start = () => {
         this.server.on("connection", (socket) => {
-            const session: SessionModel = new SessionModel(socket);
+            const session: SessionModel = new SessionModel(socket, this.sessionStorage.generateSessionId());
+            this.sessionStorage.addSession(session);
             socket.on("message", this.handleUserMessage(session, socket))
         });
     };

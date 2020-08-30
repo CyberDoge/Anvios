@@ -20,7 +20,7 @@ export function changeUserVoteOnTheme(theme: ThemeBase, agree: boolean, userId: 
     return theme;
 }
 
-function isOnline(user: any): boolean {
+function isOnline(userId: any): boolean {
     return false
 }
 
@@ -28,7 +28,7 @@ export function getThemeReadyForChat(theme: ThemeBase): boolean {
     if (!theme.votedDownIds.length || !theme.votedUpIds.length) {
         return false;
     }
-    let firstPlayer = null;
+    let firstPlayer;
     let secondPlayer = null;
     firstPlayer = theme.votedUpIds.find(upUserId => {
         if (!isOnline(upUserId)) {
