@@ -1,11 +1,13 @@
-export const CredentialsAuthRequest = {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "required": ["login", "password"],
+export const RegUserRequest = {
+    "$schema": "http://json-schema.org/draft-07/RegUserRequest",
     "properties": {
         "login": {
             "type": "string"
         },
         "password": {
+            "type": "string"
+        },
+        "token": {
             "type": "string"
         }
     },

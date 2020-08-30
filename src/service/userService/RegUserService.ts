@@ -1,13 +1,13 @@
-import AuthRequest from "../../dto/types/CredentialsAuthRequest/CredentialsAuthRequest";
 import User, {IUserSchema} from "../../model/User";
 import {validateLoginAndPassword} from "../../validator/UserCredationalsValidator";
 import InvalidRegCredentialsError from "../../error/InvalidRegCredentialsError";
 import {v1 as uuidv1} from 'uuid';
 import {hash} from "bcrypt";
+import {RegUserRequest} from "../../dto/types/RegUserRequest";
 
 const BCRYPT_SALT_ROUNDS = +(process.env.bcryptSaltRounds || 2);
 
-export async function regUser({login, password, token}: AuthRequest): Promise<IUserSchema | null> {
+export async function regUser({login, password, token}: RegUserRequest): Promise<IUserSchema | null> {
     if (!validateLoginAndPassword(login, password)) {
         throw new InvalidRegCredentialsError("Does not meet the requirements")
     }

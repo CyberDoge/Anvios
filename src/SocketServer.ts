@@ -10,7 +10,7 @@ import {
     TOKEN_AUTH,
     USER,
     VOTE_TO_THEME
-} from "./const/RoutePathConst";
+} from "./const/RoutePathAndTypeConst";
 import {handleAndSendError, sendErrorMessage} from "./controller/ErrorController";
 import {authUser, tokenAuthUser} from "./controller/LoginController";
 import {sendCurrentUserInfo} from "./controller/UserController";
@@ -50,7 +50,7 @@ export default class SocketServer {
             try {
                 // todo fix all import adding index.ts & add validate json filter
                 for (let filter of this.filtersChain) {
-                    await filter.doFilter(request.routePath, session)
+                    await filter.doFilter(request, session)
                 }
                 await this.route(request, session)
             } catch (e) {

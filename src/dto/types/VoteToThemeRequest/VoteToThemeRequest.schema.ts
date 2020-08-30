@@ -1,5 +1,5 @@
 export const VoteToThemeRequest = {
-    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$schema": "http://json-schema.org/draft-07/VoteToThemeRequest",
     "definitions": {
         "VoteToThemeRequest": {
             "properties": {
