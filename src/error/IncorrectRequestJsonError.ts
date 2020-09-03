@@ -4,7 +4,12 @@ const DEFAULT_MESSAGE = "Incorrect request json type.";
 
 @checkedErrorMarker
 export class IncorrectRequestJsonError extends Error {
-    constructor(message?: string) {
-        super(message || DEFAULT_MESSAGE);
+    constructor(reasons?: string) {
+        if (reasons) {
+            super(`${DEFAULT_MESSAGE}\nreasons: ${reasons}`);
+        } else {
+            super(DEFAULT_MESSAGE);
+
+        }
     }
 }

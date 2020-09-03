@@ -23,16 +23,16 @@ describe('test filter validation', () => {
                 requestId: "",
                 data: {bar: "zzz", login: "foo", password: "foo"}
             }));
-            await expect(filter.doFilter({
-                routePath: CREDENTIAL_AUTH,
-                requestId: "",
-                data: {login: "bar", password: "foo"}
-            })).to.be.ok;
-            await expectThrowsAsync(() => filter.doFilter({
-                routePath: CREDENTIAL_AUTH,
-                requestId: "",
-                data: {login: 123, password: "foo"}
-            }));
+        expect(await filter.doFilter({
+            routePath: CREDENTIAL_AUTH,
+            requestId: "",
+            data: {login: "bar", password: "foo"}
+        })).to.be.undefined;
+        await expectThrowsAsync(() => filter.doFilter({
+            routePath: CREDENTIAL_AUTH,
+            requestId: "",
+            data: {login: 123, password: "foo"}
+        }));
         }
     );
 
@@ -56,34 +56,35 @@ describe('test filter validation', () => {
                 requestId: "",
                 data: {bar: "zz", title: "foo", description: "bar"}
             }));
-            await expect(filter.doFilter({
+            expect(await filter.doFilter({
                 routePath: CREATE_THEME,
                 requestId: "",
                 data: {title: "foo"}
-            })).to.be.ok;
-            await expect(filter.doFilter({
+            })).to.be.undefined;
+            expect(await filter.doFilter({
                 routePath: CREATE_THEME,
                 requestId: "",
                 data: {title: "foo", description: "bar"}
-            })).to.be.ok;
+            })).to.be.undefined;
         }
     )
 
     it('void request', async () => {
             const filter = new JsonValidatorFilter();
             await expectThrowsAsync(() => filter.doFilter({routePath: REG_ANON, requestId: "", data: {foo: "bar"}}));
-            await expectThrowsAsync(() => filter.doFilter({routePath: REG_ANON, requestId: "", data: {}}));
             await expectThrowsAsync(() => filter.doFilter({routePath: REG_ANON, requestId: "", data: 1}));
-            await expect(filter.doFilter({
+            expect(await filter.doFilter({
                 routePath: REG_ANON,
                 requestId: "",
                 data: null
-            })).to.be.ok;
-            await expect(filter.doFilter(JSON.parse(`{
+            })).to.be.undefined;
+            expect(await filter.doFilter({routePath: REG_ANON, requestId: "", data: {}})).to.be.undefined;
+            expect(await filter.doFilter(JSON.parse(`{
                 "routePath": "${REG_ANON}",
-                "requestId": ""
+                "requestId": "",
+                "data": {}
                 }`))
-            ).to.be.ok;
+            ).to.be.undefined;
         }
     )
 });
@@ -93,7 +94,7 @@ const expectThrowsAsync = async (method: any) => {
         await method()
     } catch (error) {
         expect(error).to.be.an("Error");
-        expect(error.message).to.equal("Incorrect request json type.");
+        expect(error.message).to.match(/^Incorrect request json type./);
         return;
     }
     assert.fail("no throw")

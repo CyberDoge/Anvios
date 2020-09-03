@@ -1,5 +1,5 @@
 export const NewThemeRequest = {
-    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "http://json-schema.org/draft-07/NewThemeRequest",
     "required": ["title"],
     "additionalProperties": false,
     "properties": {

@@ -1,6 +1,6 @@
 import * as mongoose from "mongoose";
 import {Document, Model, Schema} from "mongoose";
-import NewThemeRequest from "../dto/types/NewThemeRequest/NewThemeRequest";
+import {NewThemeRequest} from "../dto/types/NewThemeRequest";
 import {IUserSchema} from "./User";
 import {changeUserVoteOnTheme} from "../service/themeService/ThemeService";
 import InvalidThemeDataError from "../error/InvalidThemeDataError";

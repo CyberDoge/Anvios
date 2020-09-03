@@ -1,7 +1,7 @@
 export const CredentialsAuthRequest = {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "required": ["login", "password"],
+    "$id": "http://json-schema.org/draft-07/CredentialsAuthRequest",
     "additionalProperties": false,
+    "required": ["login", "password"],
     "properties": {
         "login": {
             "type": "string"

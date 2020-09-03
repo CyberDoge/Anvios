@@ -18,7 +18,7 @@ import {regAccount, regAnonymous} from "./controller/RegController";
 import {createTheme, getSomeThemes, voteToTheme} from "./controller/ThemeController";
 import Ajv from 'ajv';
 import SessionStorage from "./storage/SessionStorage";
-import {AuthFilter, Filter} from "./filter";
+import {AuthFilter, Filter, JsonValidatorFilter} from "./filter";
 
 const PORT = +(process.env.port || 8080);
 
@@ -33,7 +33,7 @@ export default class SocketServer {
         this.server = new ws.Server({port: PORT});
         this.sessionStorage = new SessionStorage();
         this.ajv = new Ajv({allErrors: true});
-        this.filtersChain = [new AuthFilter()];
+        this.filtersChain = [new JsonValidatorFilter(), new AuthFilter()];
     }
 
     start = () => {
@@ -48,7 +48,6 @@ export default class SocketServer {
         try {
             const request: PrimaryRequest<any> = JSON.parse(data);
             try {
-                // todo fix all import adding index.ts & add validate json filter
                 for (let filter of this.filtersChain) {
                     await filter.doFilter(request, session)
                 }

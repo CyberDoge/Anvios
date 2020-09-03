@@ -19,8 +19,11 @@ export class JsonValidatorFilter implements Filter {
         if (!schema) {
             throw new IncorrectRequestJsonError("Invalid route path");
         }
-        if (!this.ajv.validate(schema, request.data)) {
-            throw new IncorrectRequestJsonError()
+        const validate = this.ajv.compile(schema);
+        if (!validate(request.data)) {
+            throw new IncorrectRequestJsonError((
+                validate.errors && validate.errors.map((error) => error.message).join(", ")
+            ) || undefined);
         }
     }
 }

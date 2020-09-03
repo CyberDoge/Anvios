@@ -1,5 +1,5 @@
 export const SomeThemesRequest = {
-    "$schema": "http://json-schema.org/draft-07/SomeThemesRequest",
+    "$id": "http://json-schema.org/draft-07/SomeThemesRequest",
     "properties": {
         "count": {
             "type": "number"

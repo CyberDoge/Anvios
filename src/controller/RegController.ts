@@ -5,7 +5,7 @@ import PrimaryResponse from "../dto/PrimaryResponse";
 import {sendError} from "./ErrorController";
 import InternalServerError from "../error/InternalServerError";
 import PrimaryRequest from "../dto/PrimaryRequest";
-import {TokenAuthRequest} from "../dto/types/TokenAuthRequest";
+import {RegUserRequest} from "../dto/types/RegUserRequest";
 
 export function regAnonymous(request: PrimaryRequest<void>, session: SessionModel) {
     regUserAnonymous().then(value => {
@@ -18,7 +18,7 @@ export function regAnonymous(request: PrimaryRequest<void>, session: SessionMode
     });
 }
 
-export async function regAccount(request: PrimaryRequest<TokenAuthRequest>, session: SessionModel): Promise<void> {
+export async function regAccount(request: PrimaryRequest<RegUserRequest>, session: SessionModel): Promise<void> {
     const user = (await regUser(request.data));
     if (!user) {
         throw new InternalServerError();
