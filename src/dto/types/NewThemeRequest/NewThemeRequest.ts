@@ -1,6 +1,6 @@
 import {IThemeSchema} from "../../../model/Theme";
 
-export default interface NewThemeRequest {
+export interface NewThemeRequest {
     title: IThemeSchema["title"];
     description?: IThemeSchema["description"];
 }

@@ -2,9 +2,9 @@
 import {CredentialsAuthRequestSchema} from "../dto/types/CredentialsAuthRequest";
 import {TokenAuthRequestSchema} from "../dto/types/TokenAuthRequest";
 import {SomeThemesRequestSchema} from "../dto/types/SomeThemeRequest";
-import {ThemeDataSchema} from "../dto/types/ThemeData";
 import {VoteToThemeRequestSchema} from "../dto/types/VoteToThemeRequest";
 import {VoidRequestSchema} from "../dto/types/VoidRequest";
+import {NewThemeRequestSchema} from "../dto/types/NewThemeRequest";
 
 export const CREDENTIAL_AUTH = "credential_auth";
 export const TOKEN_AUTH = "token_auth";
@@ -18,10 +18,10 @@ export const VOTE_TO_THEME = "vote_to_theme";
 export const ROUTE_REQUEST_VALIDATION_TYPE_MAP = new Map<string, object>([
     [CREDENTIAL_AUTH, CredentialsAuthRequestSchema],
     [TOKEN_AUTH, TokenAuthRequestSchema],
-    [REG_ANON, VoidRequestSchema], // todo check this!
+    [REG_ANON, VoidRequestSchema],
     [REG_ACCOUNT, TokenAuthRequestSchema],
     [USER, VoidRequestSchema],
     [GET_SOME_THEMES, SomeThemesRequestSchema],
-    [CREATE_THEME, ThemeDataSchema],
+    [CREATE_THEME, NewThemeRequestSchema],
     [VOTE_TO_THEME, VoteToThemeRequestSchema]
 ]);

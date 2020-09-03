@@ -14,7 +14,7 @@ export class JsonValidatorFilter implements Filter {
         this.ajv = new Ajv();
     }
 
-    async doFilter(request: PrimaryRequest<any>, session?: SessionModel): Promise<void> {
+    async doFilter(request: PrimaryRequest<any>, session?: SessionModel): Promise<void | never> {
         const schema = ROUTE_REQUEST_VALIDATION_TYPE_MAP.get(request.routePath);
         if (!schema) {
             throw new IncorrectRequestJsonError("Invalid route path");
