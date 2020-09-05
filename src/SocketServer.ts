@@ -16,7 +16,6 @@ import {authUser, tokenAuthUser} from "./controller/LoginController";
 import {sendCurrentUserInfo} from "./controller/UserController";
 import {regAccount, regAnonymous} from "./controller/RegController";
 import {createTheme, getSomeThemes, voteToTheme} from "./controller/ThemeController";
-import Ajv from 'ajv';
 import SessionStorage from "./storage/SessionStorage";
 import {AuthFilter, Filter, JsonValidatorFilter} from "./filter";
 
@@ -24,7 +23,6 @@ const PORT = +(process.env.port || 8080);
 
 export default class SocketServer {
     private server: ws.Server;
-    private ajv: Ajv.Ajv;
     private sessionStorage: SessionStorage;
 
     private readonly filtersChain: Filter[];
@@ -32,7 +30,6 @@ export default class SocketServer {
     constructor() {
         this.server = new ws.Server({port: PORT});
         this.sessionStorage = new SessionStorage();
-        this.ajv = new Ajv({allErrors: true});
         this.filtersChain = [new JsonValidatorFilter(), new AuthFilter()];
     }
 
@@ -92,7 +89,7 @@ export default class SocketServer {
                 break;
             }
             case VOTE_TO_THEME: {
-                voteToTheme(request, session);
+                voteToTheme(request, session, this.sessionStorage);
                 break;
             }
             default: {

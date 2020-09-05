@@ -1,4 +1,5 @@
-import {ThemeBase} from "./types/ThemeService.types";
+import {ThemeBase, UserIdsWithThemeReadyForChat} from "./types/ThemeService.types";
+import SessionStorage from "../../storage/SessionStorage";
 
 export function changeUserVoteOnTheme(theme: ThemeBase, agree: boolean, userId: string): ThemeBase {
     const agreedUserIndex = theme.votedUpIds.indexOf(userId);
@@ -20,24 +21,20 @@ export function changeUserVoteOnTheme(theme: ThemeBase, agree: boolean, userId: 
     return theme;
 }
 
-function isOnline(userId: any): boolean {
-    return false
-}
-
-export function getThemeReadyForChat(theme: ThemeBase): boolean {
+export function getUserIdsWithThemeReadyForChat(theme: ThemeBase, isUserOnline: SessionStorage["isUserOnline"]): UserIdsWithThemeReadyForChat {
     if (!theme.votedDownIds.length || !theme.votedUpIds.length) {
-        return false;
+        return {upUserId: null, downUserId: null};
     }
-    let firstPlayer;
-    let secondPlayer = null;
-    firstPlayer = theme.votedUpIds.find(upUserId => {
-        if (!isOnline(upUserId)) {
+    let upUserId;
+    let downUserId = null;
+    upUserId = theme.votedUpIds.find(upUserId => {
+        if (!isUserOnline(upUserId)) {
             return false;
         }
-        secondPlayer = theme.votedDownIds.find(downUserId => {
-            return isOnline(downUserId);
-        });
-        return secondPlayer;
+        downUserId = theme.votedDownIds.find(isUserOnline);
+        return downUserId;
     });
-    return firstPlayer;
+    return {
+        upUserId, downUserId
+    };
 }

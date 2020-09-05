@@ -7,6 +7,8 @@ import PrimaryRequest from "../dto/PrimaryRequest";
 import {VoteToThemeRequest} from "../dto/types/VoteToThemeRequest";
 import {SomeThemesRequest} from "../dto/types/SomeThemeRequest";
 import {ThemeData} from "../dto/types/ThemeData";
+import {getUserIdsWithThemeReadyForChat} from "../service/themeService/ThemeService";
+import SessionStorage from "../storage/SessionStorage";
 
 export function getSomeThemes(request: PrimaryRequest<SomeThemesRequest>, session: SessionModel): void {
     Theme.getSomeSortedByDateThemes(request.data.from, request.data.count || 0).then((themes) => {
@@ -31,9 +33,14 @@ export function createTheme(request: PrimaryRequest<NewThemeRequest>, session: S
     })
 }
 
-export function voteToTheme(request: PrimaryRequest<VoteToThemeRequest>, session: SessionModel) {
+export function voteToTheme(request: PrimaryRequest<VoteToThemeRequest>, session: SessionModel, sessionStorage: SessionStorage) {
     Theme.voteToTheme(request.data.themeId, request.data.agree, session.userId!).then((theme) => {
-        session.sendResponse(new PrimaryResponse({themeId: theme._id}, request.requestId))
+        session.sendResponse(new PrimaryResponse({themeId: theme._id}, request.requestId));
+        const userIds = getUserIdsWithThemeReadyForChat(theme, sessionStorage.isUserOnline);
+        if (userIds.downUserId && userIds.upUserId) {
+            sessionStorage.sendMessageUserWithId(userIds.downUserId, new PrimaryResponse(theme.id, "themeReady"))
+            sessionStorage.sendMessageUserWithId(userIds.upUserId, new PrimaryResponse(theme.id, "themeReady"))
+        }
     }).catch(reason => {
         session.sendError(reason, request.requestId);
     })

@@ -7,8 +7,7 @@ export type ThemeBase = {
     votedDownIds: Array<IUserSchema["_id"]>,
 }
 
-export type UsersTheme = {
+export type UserIdsWithThemeReadyForChat = {
     upUserId: IUserSchema["_id"],
     downUserId: IUserSchema["_id"],
-
 }

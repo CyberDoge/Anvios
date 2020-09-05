@@ -1,7 +1,7 @@
 import User, {IUserSchema} from "../../model/User";
 import {validateLoginAndPassword} from "../../validator/UserCredationalsValidator";
 import InvalidRegCredentialsError from "../../error/InvalidRegCredentialsError";
-import {v1 as uuidv1} from 'uuid';
+import {v4 as uuidv4} from 'uuid';
 import {hash} from "bcrypt";
 import {RegUserRequest} from "../../dto/types/RegUserRequest";
 
@@ -18,9 +18,9 @@ export async function regUser({login, password, token}: RegUserRequest): Promise
     if (token) {
         return User.findOneAndUpdate({token}, {$set: {login, password: hashedPassword}}).lean();
     }
-    return (await User.create({login, password: hashedPassword, token: uuidv1()}));
+    return (await User.create({login, password: hashedPassword, token: uuidv4()}));
 }
 
 export async function regUserAnonymous(): Promise<IUserSchema> {
-    return await User.create({token: uuidv1()});
+    return await User.create({token: uuidv4()});
 }
