@@ -8,8 +8,8 @@ import {VoteToThemeRequest} from "../dto/types/VoteToThemeRequest";
 import {SomeThemesRequest} from "../dto/types/SomeThemeRequest";
 import {ThemeData} from "../dto/types/ThemeData";
 import {getUserIdsWithThemeReadyForChat} from "../service/themeService/ThemeService";
-import {THEME_READY} from "../const/ServerRequestIdConst";
 import {sessionStorage} from "../storage";
+import {createChatWithUsers} from "./ChatController";
 
 export function getSomeThemes(request: PrimaryRequest<SomeThemesRequest>, session: SessionModel): void {
     Theme.getSomeSortedByDateThemes(request.data.from, request.data.count || 0).then((themes) => {
@@ -39,8 +39,7 @@ export function voteToTheme(request: PrimaryRequest<VoteToThemeRequest>, session
         session.sendMessage(new PrimaryResponse({themeId: theme._id}, request.requestId));
         const userIds = getUserIdsWithThemeReadyForChat(theme, sessionStorage.isUserOnline);
         if (userIds.downUserId && userIds.upUserId) {
-            sessionStorage.sendMessageUserWithId(userIds.downUserId, new PrimaryResponse(theme.id, THEME_READY))
-            sessionStorage.sendMessageUserWithId(userIds.upUserId, new PrimaryResponse(theme.id, THEME_READY))
+            createChatWithUsers(userIds.downUserId, userIds.upUserId, theme.id)
         }
     }).catch(reason => {
         session.sendError(reason, request.requestId);

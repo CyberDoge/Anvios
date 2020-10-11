@@ -1,4 +1,4 @@
-import {IChatRoom} from "../model/ChatRoom";
+import {IChatRoom} from "../model/ChatRoom/ChatRoom";
 
 class ChatRoomStorage {
     private chatRooms: Array<IChatRoom>;

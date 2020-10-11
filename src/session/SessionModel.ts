@@ -1,6 +1,7 @@
 import WebSocket from "ws";
 import PrimaryResponse from "../dto/PrimaryResponse";
 import {SESSION_CHECK_TIMEOUT} from "../const/SessionConst";
+import IOnMessageHandler from "../handler/IOnMessageHandler";
 
 export default class SessionModel {
     userId: string | null = null;
@@ -37,7 +38,7 @@ export default class SessionModel {
         this.socket.ping();
     };
 
-    sendMessage = (response: PrimaryResponse) => {
+    sendMessage = (response: PrimaryResponse<unknown>) => {
         this.socket.send(JSON.stringify(response))
     };
 
@@ -48,4 +49,9 @@ export default class SessionModel {
     sendStringMessage = (message: string, requestId: string) => {
         this.sendMessage(new PrimaryResponse({message}, requestId))
     };
+
+    setupNewMessageHandler = (handler: IOnMessageHandler["handler"]) => {
+        this.socket.removeAllListeners("message");
+        this.socket.on("message", handler);
+    }
 }

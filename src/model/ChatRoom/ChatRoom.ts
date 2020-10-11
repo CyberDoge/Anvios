@@ -1,8 +1,8 @@
 import * as mongoose from "mongoose";
-import {Document, Model} from "mongoose";
-import {IUserSchema} from "./User";
-import {IThemeSchema} from "./Theme";
-import {IChatMessage} from "./ChatMessage";
+import {Document, Model, Types} from "mongoose";
+import {IUserSchema} from "../User";
+import {IThemeSchema} from "../Theme";
+import {IChatMessage} from "../ChatMessage";
 
 export interface IChatRoom extends Document {
     downUserId: IUserSchema["_id"],
@@ -16,8 +16,8 @@ export const ChatRoomSchema = new mongoose.Schema({
     downUserId: {type: String},
     upUserId: {type: String},
     themeId: {type: String},
-    downUserMessages: {type: [mongoose.Types.ObjectId]},
-    upUserMessages: {type: [mongoose.Types.ObjectId]},
+    downUserMessages: {type: [Types.ObjectId]},
+    upUserMessages: {type: [Types.ObjectId]},
 })
 
 interface IChatRoomModel extends Model<IChatRoom> {

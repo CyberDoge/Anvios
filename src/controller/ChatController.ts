@@ -1,9 +1,11 @@
 import {IUserSchema} from "../model/User";
-import ChatRoom from "../model/ChatRoom";
+import ChatRoom from "../model/ChatRoom/ChatRoom";
 import {IThemeSchema} from "../model/Theme";
-import {chatRoomStorage} from "../storage";
+import {chatRoomStorage, sessionStorage} from "../storage";
+import PrimaryResponse from "../dto/PrimaryResponse";
+import {THEME_READY} from "../const/ServerRequestIdConst";
 
-export async function createChatRoom(downUserId: IUserSchema["_id"], upUserId: IUserSchema["_id"], themeId: IThemeSchema["_id"]): Promise<void> {
+export async function createChatWithUsers(downUserId: IUserSchema["_id"], upUserId: IUserSchema["_id"], themeId: IThemeSchema["_id"]): Promise<void> {
     const chatRoom = await ChatRoom.create({
         downUserId,
         upUserId,
@@ -12,5 +14,9 @@ export async function createChatRoom(downUserId: IUserSchema["_id"], upUserId: I
         upUserMessages: []
     });
     chatRoomStorage.addChat(chatRoom);
-    return;
+    sessionStorage.sendMessageUserWithId(downUserId, new PrimaryResponse<IThemeSchema["_id"]>(themeId, THEME_READY));
+    sessionStorage.sendMessageUserWithId(upUserId, new PrimaryResponse<IThemeSchema["_id"]>(themeId, THEME_READY));
+}
+
+export function receiveMessageAndSendBroadCast() {
 }
