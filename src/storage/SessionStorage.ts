@@ -29,7 +29,7 @@ export default class SessionStorage {
     sendMessageUserWithId = (id: IUserSchema["id"], response: PrimaryResponse) => {
         const session = this.getSessionModelByUserId(id);
         if (session) {
-            session.sendResponse(response);
+            session.sendMessage(response);
         }
     }
 }

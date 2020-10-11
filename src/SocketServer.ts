@@ -16,27 +16,25 @@ import {authUser, tokenAuthUser} from "./controller/LoginController";
 import {sendCurrentUserInfo} from "./controller/UserController";
 import {regAccount, regAnonymous} from "./controller/RegController";
 import {createTheme, getSomeThemes, voteToTheme} from "./controller/ThemeController";
-import SessionStorage from "./storage/SessionStorage";
 import {AuthFilter, Filter, JsonValidatorFilter} from "./filter";
+import {sessionStorage} from "./storage";
 
 const PORT = +(process.env.port || 8080);
 
 export default class SocketServer {
     private server: ws.Server;
-    private sessionStorage: SessionStorage;
 
     private readonly filtersChain: Filter[];
 
     constructor() {
         this.server = new ws.Server({port: PORT});
-        this.sessionStorage = new SessionStorage();
         this.filtersChain = [new JsonValidatorFilter(), new AuthFilter()];
     }
 
     start = () => {
         this.server.on("connection", (socket) => {
-            const session: SessionModel = new SessionModel(socket, this.sessionStorage.generateSessionId());
-            this.sessionStorage.addSession(session);
+            const session: SessionModel = new SessionModel(socket, sessionStorage.generateSessionId());
+            sessionStorage.addSession(session);
             socket.on("message", this.handleUserMessage(session, socket))
         });
     };
@@ -89,7 +87,7 @@ export default class SocketServer {
                 break;
             }
             case VOTE_TO_THEME: {
-                voteToTheme(request, session, this.sessionStorage);
+                voteToTheme(request, session);
                 break;
             }
             default: {

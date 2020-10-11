@@ -15,9 +15,9 @@ export function tokenAuthUser({data, requestId}: PrimaryRequest<TokenAuthRequest
 const setSessionAndSendResponse = (session: SessionModel, requestId: string) => (result: string | null) => {
     session.userId = result;
     if (session.userId) {
-        session.sendMessage("success", requestId);
+        session.sendStringMessage("success", requestId);
     } else {
-        session.sendMessage("failed", requestId);
+        session.sendStringMessage("failed", requestId);
     }
 };
 

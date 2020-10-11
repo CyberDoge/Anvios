@@ -8,7 +8,8 @@ import {VoteToThemeRequest} from "../dto/types/VoteToThemeRequest";
 import {SomeThemesRequest} from "../dto/types/SomeThemeRequest";
 import {ThemeData} from "../dto/types/ThemeData";
 import {getUserIdsWithThemeReadyForChat} from "../service/themeService/ThemeService";
-import SessionStorage from "../storage/SessionStorage";
+import {THEME_READY} from "../const/ServerRequestIdConst";
+import {sessionStorage} from "../storage";
 
 export function getSomeThemes(request: PrimaryRequest<SomeThemesRequest>, session: SessionModel): void {
     Theme.getSomeSortedByDateThemes(request.data.from, request.data.count || 0).then((themes) => {
@@ -19,7 +20,7 @@ export function getSomeThemes(request: PrimaryRequest<SomeThemesRequest>, sessio
                 description: themeSchema.description
             }
         ));
-        session.sendResponse(new PrimaryResponse({themes: themesRequest}, request.requestId))
+        session.sendMessage(new PrimaryResponse({themes: themesRequest}, request.requestId))
     });
 }
 
@@ -29,17 +30,17 @@ export function createTheme(request: PrimaryRequest<NewThemeRequest>, session: S
         return;
     }
     Theme.createTheme(request.data).then(() => {
-        session.sendMessage("success", request.requestId)
+        session.sendStringMessage("success", request.requestId)
     })
 }
 
-export function voteToTheme(request: PrimaryRequest<VoteToThemeRequest>, session: SessionModel, sessionStorage: SessionStorage) {
+export function voteToTheme(request: PrimaryRequest<VoteToThemeRequest>, session: SessionModel) {
     Theme.voteToTheme(request.data.themeId, request.data.agree, session.userId!).then((theme) => {
-        session.sendResponse(new PrimaryResponse({themeId: theme._id}, request.requestId));
+        session.sendMessage(new PrimaryResponse({themeId: theme._id}, request.requestId));
         const userIds = getUserIdsWithThemeReadyForChat(theme, sessionStorage.isUserOnline);
         if (userIds.downUserId && userIds.upUserId) {
-            sessionStorage.sendMessageUserWithId(userIds.downUserId, new PrimaryResponse(theme.id, "themeReady"))
-            sessionStorage.sendMessageUserWithId(userIds.upUserId, new PrimaryResponse(theme.id, "themeReady"))
+            sessionStorage.sendMessageUserWithId(userIds.downUserId, new PrimaryResponse(theme.id, THEME_READY))
+            sessionStorage.sendMessageUserWithId(userIds.upUserId, new PrimaryResponse(theme.id, THEME_READY))
         }
     }).catch(reason => {
         session.sendError(reason, request.requestId);

@@ -37,15 +37,15 @@ export default class SessionModel {
         this.socket.ping();
     };
 
-    sendResponse = (response: PrimaryResponse) => {
+    sendMessage = (response: PrimaryResponse) => {
         this.socket.send(JSON.stringify(response))
     };
 
     sendError = (error: Error, requestId: string,) => {
-        this.sendResponse(new PrimaryResponse(null, requestId, error.message))
+        this.sendMessage(new PrimaryResponse(null, requestId, error.message))
     };
 
-    sendMessage = (message: string, requestId: string) => {
-        this.sendResponse(new PrimaryResponse({message}, requestId))
+    sendStringMessage = (message: string, requestId: string) => {
+        this.sendMessage(new PrimaryResponse({message}, requestId))
     };
 }

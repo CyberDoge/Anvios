@@ -11,7 +11,7 @@ export function regAnonymous(request: PrimaryRequest<void>, session: SessionMode
     regUserAnonymous().then(value => {
         if (value) {
             session.userId = value._id;
-            session.sendResponse(new PrimaryResponse({token: value.token}, request.requestId));
+            session.sendMessage(new PrimaryResponse({token: value.token}, request.requestId));
         }
     }).catch(e => {
         sendError(e, request.requestId, session);
@@ -24,5 +24,5 @@ export async function regAccount(request: PrimaryRequest<RegUserRequest>, sessio
         throw new InternalServerError();
     }
     session.userId = user._id;
-    session.sendResponse(new PrimaryResponse({token: user.token}, request.requestId));
+    session.sendMessage(new PrimaryResponse({token: user.token}, request.requestId));
 }
