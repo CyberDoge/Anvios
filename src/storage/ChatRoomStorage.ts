@@ -1,13 +1,13 @@
-import {IChatRoom} from "../model/ChatRoom/ChatRoom";
+import ChatRoomImpl from "../model/ChatRoom/ChatRoomImpl";
 
 class ChatRoomStorage {
-    private chatRooms: Array<IChatRoom>;
+    private chatRooms: Array<ChatRoomImpl>;
 
     constructor() {
-        this.chatRooms = new Array<IChatRoom>();
+        this.chatRooms = new Array<ChatRoomImpl>();
     }
 
-    public addChat(chatRoom: IChatRoom): void {
+    public addChat(chatRoom: ChatRoomImpl): void {
         this.chatRooms.push(chatRoom);
     }
 }

@@ -39,7 +39,7 @@ export function voteToTheme(request: PrimaryRequest<VoteToThemeRequest>, session
         session.sendMessage(new PrimaryResponse({themeId: theme._id}, request.requestId));
         const userIds = getUserIdsWithThemeReadyForChat(theme, sessionStorage.isUserOnline);
         if (userIds.downUserId && userIds.upUserId) {
-            createChatWithUsers(userIds.downUserId, userIds.upUserId, theme.id)
+            createChatWithUsers(userIds.downUserId, userIds.upUserId, theme.id, theme.title);
         }
     }).catch(reason => {
         session.sendError(reason, request.requestId);

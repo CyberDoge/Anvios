@@ -2,7 +2,7 @@ import * as mongoose from "mongoose";
 import {Document, Model, Types} from "mongoose";
 import {IUserSchema} from "../User";
 import {IThemeSchema} from "../Theme";
-import {IChatMessage} from "../ChatMessage";
+import {IChatMessage} from "./ChatMessage";
 
 export interface IChatRoom extends Document {
     downUserId: IUserSchema["_id"],
