@@ -26,10 +26,10 @@ export default class SessionStorage {
         return !!this.getSessionModelByUserId(id)?.isAlive
     }
 
-    sendMessageUserWithId = (id: IUserSchema["id"], response: PrimaryResponse) => {
+    sendMessageUserWithId = (id: IUserSchema["id"], response: PrimaryResponse<unknown>) => {
         const session = this.getSessionModelByUserId(id);
         if (session) {
-            session.sendResponse(response);
+            session.sendMessage(response);
         }
     }
 }

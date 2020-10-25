@@ -5,7 +5,7 @@ import InternalServerError from "../error/InternalServerError";
 import logger from "../config/WinstonLogger";
 
 export function sendErrorMessage(message: string, requestId: string, session: SessionModel) {
-    session.sendResponse(new PrimaryResponse(null, requestId, message));
+    session.sendMessage(new PrimaryResponse(null, requestId, message));
 }
 
 export function sendError(error: Error, requestId: string, session: SessionModel) {
