@@ -6,7 +6,7 @@ import {VoteToThemeRequestSchema} from "../dto/types/VoteToThemeRequest";
 import {VoidRequestSchema} from "../dto/types/VoidRequest";
 import {NewThemeRequestSchema} from "../dto/types/NewThemeRequest";
 import {RegUserRequestSchema} from "../dto/types/RegUserRequest";
-import {SendMessageRequestSchema} from "../dto/types/SendMessageRequest";
+import {ChatMessageRequestSchema} from "../dto/types/ChatMessageRequest";
 
 export const CREDENTIAL_AUTH = "credential_auth";
 export const TOKEN_AUTH = "token_auth";
@@ -27,5 +27,5 @@ export const ROUTE_REQUEST_VALIDATION_TYPE_MAP = new Map<string, object>([
     [GET_SOME_THEMES, SomeThemesRequestSchema],
     [CREATE_THEME, NewThemeRequestSchema],
     [VOTE_TO_THEME, VoteToThemeRequestSchema],
-    [SEND_MESSAGE, SendMessageRequestSchema],
+    [SEND_MESSAGE, ChatMessageRequestSchema],
 ]);

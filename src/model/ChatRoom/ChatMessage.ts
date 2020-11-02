@@ -15,7 +15,7 @@ interface IChatMessageModel extends Model<IChatMessage> {
 
 const chatMessageSchema = new mongoose.Schema({
     data: {
-        type: [String, Buffer, ArrayBuffer, [Buffer]]
+        type: String // todo multiply types
     },
     event: {
         type: ChatEvent

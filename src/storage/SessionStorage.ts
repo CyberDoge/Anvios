@@ -8,6 +8,18 @@ export default class SessionStorage {
 
     constructor() {
         this.sessions = new Map<SessionModel["sessionId"], SessionModel>();
+        setInterval(this.clearDead, 5000)
+    }
+
+    clearDead = () => {
+        const deleteIds: Number[] = [];
+        this.sessions.forEach((session, key) => {
+            if (!session.isAlive) {
+                deleteIds.push(key);
+            }
+        });
+        deleteIds.forEach(id => this.sessions.delete(id));
+        console.log(`deleted ${deleteIds.length}`)
     }
 
     addSession = (session: SessionModel): void => {

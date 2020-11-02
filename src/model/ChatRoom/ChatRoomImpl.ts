@@ -2,11 +2,12 @@ import SessionModel from "../../session/SessionModel";
 import WebSocket from "ws";
 import PrimaryResponse from "../../dto/PrimaryResponse";
 import ChatEvent from "./ChatEvent";
-import ChatMessage, {IChatMessage} from "./ChatMessage";
+import ChatMessage from "./ChatMessage";
 import {JsonValidatorFilter} from "../../filter";
 import PrimaryRequest from "../../dto/PrimaryRequest";
 import {handleAndSendError} from "../../controller/ErrorController";
 import {IUserSchema} from "../User";
+import {ChatMessageRequest} from "../../dto/types/ChatMessageRequest";
 
 const filter: JsonValidatorFilter = new JsonValidatorFilter();
 
@@ -27,7 +28,15 @@ class ChatRoomImpl {
         this.currentUser = Math.random() >= 0.5 ? this.upUser : this.downUser;
         this.waitingUser = this.currentUser === this.upUser ? this.downUser : this.upUser;
         this.upUser.setupNewMessageHandler(this.userMessageHandler(this.upUser))
-        this.downUser.setupNewMessageHandler(this.userMessageHandler(this.upUser))
+        this.downUser.setupNewMessageHandler(this.userMessageHandler(this.downUser))
+        if (!this.upUser.userId || !this.downUser.userId) {
+            throw new Error(`
+            Try to start server.
+            \nID is null. upUser id: ${this.upUser.userId}, downUser id: ${this.downUser.userId}
+            `)
+        }
+        this.sendMessage(ChatEvent.CHAT_STARTED, this.upUser, "server", this.downUser.userId!)
+        this.sendMessage(ChatEvent.CHAT_STARTED, this.downUser, "server", this.upUser.userId!)
         this.timer = setTimeout(() => {
         }, 0);
     }
@@ -38,18 +47,22 @@ class ChatRoomImpl {
 
     private userMessageHandler = (user: SessionModel) => async (message: WebSocket.Data): Promise<void> => {
         if (typeof message === "string") {
-            const chatMessage: PrimaryRequest<IChatMessage> = JSON.parse(message);
+            const chatMessageReq: PrimaryRequest<ChatMessageRequest> = JSON.parse(message);
             try {
-                await filter.doFilter(chatMessage);
+                await filter.doFilter(chatMessageReq);
             } catch (e) {
-                handleAndSendError(e, chatMessage.requestId, user);
+                handleAndSendError(e, chatMessageReq.requestId, user);
             }
-            this.receiveMessageFromCurrentUser(user, chatMessage.data);
+            chatMessageReq.data.fromUser = user.userId;
+            chatMessageReq.data.event = ChatEvent.CURRENT_USER_SEND_MESSAGE;
+            this.receiveMessageFromCurrentUser(user, chatMessageReq.data);
         }
     }
-    private receiveMessageFromCurrentUser = (user: SessionModel, chatMessage: IChatMessage): void => {
+    private receiveMessageFromCurrentUser = (user: SessionModel, chatMessage: ChatMessageRequest): void => {
         if (user === this.currentUser && typeof chatMessage.data === "string") {
             this.sendBroadCastMessage(chatMessage.data)
+        } else {
+            this.sendMessage(ChatEvent.NOT_YOUR_TURN, user, "server", "not your turn")
         }
     }
     private sendBroadCastMessage = (message: string): void => {
@@ -57,7 +70,7 @@ class ChatRoomImpl {
             this.sendMessage(ChatEvent.CURRENT_USER_SEND_MESSAGE, user, this.currentUser.userId, message)
         });
         this.sendMessage(ChatEvent.CURRENT_USER_SEND_MESSAGE, this.waitingUser, this.currentUser.userId, message);
-        this.sendMessage(ChatEvent.NOTIFY_CURRENT_USER_MESSAGE_DELIVERED, this.currentUser, this.currentUser.userId, "received");
+        this.sendMessage(ChatEvent.NOTIFY_CURRENT_USER_MESSAGE_DELIVERED, this.currentUser, this.currentUser.userId, message);
         this.startNextRound();
     }
     private sendMessage = (event: ChatEvent, toUser: SessionModel, fromUser: IUserSchema["_id"], message: string): void => {

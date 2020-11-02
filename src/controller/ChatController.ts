@@ -32,7 +32,7 @@ export async function createChatWithUsers(
         logger.error(`votedDown ${votedDown} with id ${downUserId} or votedUp ${votedUp} with id ${upUserId}  is empty`);
         return;
     }
-    const chatRoomImpl = new ChatRoomImpl(votedDown, upUserId);
+    const chatRoomImpl = new ChatRoomImpl(votedDown, votedUp);
     chatRoomStorage.addChat(chatRoomImpl);
     chatRoomImpl.startChat();
 

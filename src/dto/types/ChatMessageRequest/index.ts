@@ -1,4 +1,4 @@
 import {ChatMessageRequest} from "./ChatMessageRequest";
-import {ChatMessageRequest as CredentialsAuthRequestSchema} from "./ChatMessageRequest.schema";
+import {ChatMessageRequest as ChatMessageRequestSchema} from "./ChatMessageRequest.schema";
 
-export {ChatMessageRequest, CredentialsAuthRequestSchema}
+export {ChatMessageRequest, ChatMessageRequestSchema}

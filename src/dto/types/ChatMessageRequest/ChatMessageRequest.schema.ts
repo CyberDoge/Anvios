@@ -1,12 +1,9 @@
 export const ChatMessageRequest = {
     "$id": "http://json-schema.org/draft-07/ChatMessageRequest",
     "additionalProperties": false,
-    "required": ["data", "event", "toUser"],
+    "required": ["data", "toUser"],
     "properties": {
         "data": {
-            "type": "string"
-        },
-        "event": {
             "type": "string"
         },
         "toUser": {
