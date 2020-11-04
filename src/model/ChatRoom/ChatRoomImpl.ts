@@ -8,6 +8,7 @@ import PrimaryRequest from "../../dto/PrimaryRequest";
 import {handleAndSendError} from "../../controller/ErrorController";
 import {IUserSchema} from "../User";
 import {ChatMessageRequest} from "../../dto/types/ChatMessageRequest";
+import {ChatStartedResponse} from "../../dto/types/ChatStartedResponse";
 
 const filter: JsonValidatorFilter = new JsonValidatorFilter();
 
@@ -35,8 +36,18 @@ class ChatRoomImpl {
             \nID is null. upUser id: ${this.upUser.userId}, downUser id: ${this.downUser.userId}
             `)
         }
-        this.sendMessage(ChatEvent.CHAT_STARTED, this.upUser, "server", this.downUser.userId!)
-        this.sendMessage(ChatEvent.CHAT_STARTED, this.downUser, "server", this.upUser.userId!)
+        this.sendObject(ChatEvent.CHAT_STARTED, this.upUser, "server", {
+            upUserId: this.upUser.userId,
+            downUserId: this.downUser.userId,
+            enemyId: this.downUser.userId,
+            youStart: this.currentUser === this.downUser
+        })
+        this.sendObject(ChatEvent.CHAT_STARTED, this.downUser, "server", {
+            upUserId: this.upUser.userId,
+            downUserId: this.downUser.userId,
+            enemyId: this.upUser.userId,
+            youStart: this.currentUser === this.upUser
+        })
         this.timer = setTimeout(() => {
         }, 0);
     }
@@ -81,9 +92,17 @@ class ChatRoomImpl {
             fromUser
         }), `message#${this.messageIndex}`));
     }
+    private sendObject = (event: ChatEvent, toUser: SessionModel, fromUser: IUserSchema["_id"], object: ChatStartedResponse): void => {
+        toUser.sendMessage(new PrimaryResponse(new ChatMessage({
+            data: object,
+            event,
+            toUser,
+            fromUser
+        }), `message#${this.messageIndex}`));
+    }
     private startNextRound = (): void => {
-        this.sendMessage(ChatEvent.NEXT_ROUND_STARTED, this.currentUser, "server", "next round started");
-        this.sendMessage(ChatEvent.NEXT_ROUND_STARTED, this.waitingUser, "server", "next round started");
+        this.sendMessage(ChatEvent.NEXT_ROUND_STARTED, this.currentUser, "server", "enemy");
+        this.sendMessage(ChatEvent.NEXT_ROUND_STARTED, this.waitingUser, "server", "you");
         this.spectators.forEach((user) =>
             this.sendMessage(ChatEvent.NEXT_ROUND_STARTED, user, "server", "next round started")
         )
@@ -93,7 +112,7 @@ class ChatRoomImpl {
         ++this.roundNumber;
         ++this.messageIndex;
         clearTimeout(this.timer);
-        this.timer = setTimeout(this.startNextRound, 60000)
+        this.timer = setTimeout(this.startNextRound, 120000)
     }
 }
 

@@ -4,7 +4,7 @@ import ChatEvent from "./ChatEvent";
 import {IUserSchema} from "../User";
 
 export interface IChatMessage extends Document {
-    data: IOnMessageHandler["dataType"],
+    data: IOnMessageHandler["dataType"] | NonNullable<Object>,
     event: ChatEvent,
     fromUser: IUserSchema["_id"],
     toUser: IUserSchema["_id"],
@@ -15,7 +15,7 @@ interface IChatMessageModel extends Model<IChatMessage> {
 
 const chatMessageSchema = new mongoose.Schema({
     data: {
-        type: String // todo multiply types
+        type: Schema.Types.Mixed
     },
     event: {
         type: ChatEvent
