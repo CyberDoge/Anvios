@@ -1,5 +1,4 @@
 import {IUserSchema} from "../model/User";
-import ChatRoom from "../model/ChatRoom/ChatRoom";
 import {IThemeSchema} from "../model/Theme";
 import {chatRoomStorage, sessionStorage} from "../storage";
 import PrimaryResponse from "../dto/PrimaryResponse";
@@ -11,19 +10,10 @@ import logger from "../config/WinstonLogger";
 export async function createChatWithUsers(
     downUserId: IUserSchema["_id"], upUserId: IUserSchema["_id"], themeId: IThemeSchema["_id"], themeTitle: IThemeSchema["title"]
 ): Promise<void> {
-    const chatRoom = await ChatRoom.create({
-        downUserId,
-        upUserId,
-        themeId,
-        downUserMessages: [],
-        upUserMessages: []
-    });
     sessionStorage.sendMessageUserWithId(downUserId, new PrimaryResponse<ThemeReadyResponse>({
-        chatId: chatRoom.id,
         themeTitle
     }, THEME_READY));
     sessionStorage.sendMessageUserWithId(upUserId, new PrimaryResponse<ThemeReadyResponse>({
-        chatId: chatRoom.id,
         themeTitle
     }, THEME_READY));
     const votedDown = sessionStorage.getSessionModelByUserId(downUserId);
@@ -32,7 +22,7 @@ export async function createChatWithUsers(
         logger.error(`votedDown ${votedDown} with id ${downUserId} or votedUp ${votedUp} with id ${upUserId}  is empty`);
         return;
     }
-    const chatRoomImpl = new ChatRoomImpl(votedDown, votedUp);
+    const chatRoomImpl = new ChatRoomImpl(votedDown, votedUp, themeId);
     chatRoomStorage.addChat(chatRoomImpl);
     chatRoomImpl.startChat();
 
