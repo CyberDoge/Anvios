@@ -19,7 +19,6 @@ export default class SessionStorage {
             }
         });
         deleteIds.forEach(id => this.sessions.delete(id));
-        console.log(`deleted ${deleteIds.length}`)
     }
 
     addSession = (session: SessionModel): void => {

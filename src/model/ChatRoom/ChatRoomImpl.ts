@@ -2,19 +2,25 @@ import SessionModel from "../../session/SessionModel";
 import WebSocket from "ws";
 import PrimaryResponse from "../../dto/PrimaryResponse";
 import ChatEvent from "./ChatEvent";
-import ChatMessage from "./ChatMessage";
+import ChatMessage, {IChatMessage} from "./ChatMessage";
 import {JsonValidatorFilter} from "../../filter";
 import PrimaryRequest from "../../dto/PrimaryRequest";
 import {handleAndSendError} from "../../controller/ErrorController";
 import {IUserSchema} from "../User";
 import {ChatMessageRequest} from "../../dto/types/ChatMessageRequest";
 import {ChatStartedResponse} from "../../dto/types/ChatStartedResponse";
+import ChatRoom from "./ChatRoom";
+import {IThemeSchema} from "../Theme";
+import {log} from "winston";
 
 const filter: JsonValidatorFilter = new JsonValidatorFilter();
 
 class ChatRoomImpl {
     private readonly downUser: SessionModel;
     private readonly upUser: SessionModel;
+    private readonly themeId: IThemeSchema["_id"];
+    private readonly downUserMessages: Array<IChatMessage["_id"]>;
+    private readonly upUserMessages: Array<IChatMessage["_id"]>;
     private spectators: Array<SessionModel>;
     private currentUser: SessionModel = this.upUser;
     private waitingUser: SessionModel = this.downUser;
@@ -22,9 +28,12 @@ class ChatRoomImpl {
     private roundNumber: number = 0;
     private timer: NodeJS.Timeout;
 
-    constructor(downUser: SessionModel, upUser: SessionModel) {
+    constructor(downUser: SessionModel, upUser: SessionModel, themeId: IThemeSchema["_id"]) {
         this.downUser = downUser;
         this.upUser = upUser;
+        this.themeId = themeId;
+        this.downUserMessages = [];
+        this.upUserMessages = [];
         this.spectators = [];
         this.currentUser = Math.random() >= 0.5 ? this.upUser : this.downUser;
         this.waitingUser = this.currentUser === this.upUser ? this.downUser : this.upUser;
@@ -69,8 +78,24 @@ class ChatRoomImpl {
             this.receiveMessageFromCurrentUser(user, chatMessageReq.data);
         }
     }
+    private endGame = (winnerId: IUserSchema["_id"]) => {
+        clearTimeout(this.timer);
+        const chatRoomBd = new ChatRoom({
+            downUserId: this.downUser.userId,
+            upUserId: this.upUser.userId,
+            themeId: this.themeId,
+            winnerId,
+            downUserMessages: this.downUserMessages,
+            upUserMessages: this.upUserMessages
+        });
+        chatRoomBd.save();
+    }
     private receiveMessageFromCurrentUser = (user: SessionModel, chatMessage: ChatMessageRequest): void => {
         if (user === this.currentUser && typeof chatMessage.data === "string") {
+            if (chatMessage.data === "loose") {
+                this.endGame(this.waitingUser.userId);
+                return;
+            }
             this.sendBroadCastMessage(chatMessage.data)
         } else {
             this.sendMessage(ChatEvent.NOT_YOUR_TURN, user, "server", "not your turn")
@@ -85,12 +110,19 @@ class ChatRoomImpl {
         this.startNextRound();
     }
     private sendMessage = (event: ChatEvent, toUser: SessionModel, fromUser: IUserSchema["_id"], message: string): void => {
-        toUser.sendMessage(new PrimaryResponse(new ChatMessage({
+        const chatMessageBdModel = new ChatMessage({
             data: message,
             event,
-            toUser,
+            toUser: toUser.userId,
             fromUser
-        }), `message#${this.messageIndex}`));
+        });
+        if(fromUser === this.upUser.userId){
+            this.upUserMessages.push(chatMessageBdModel._id);
+        }else {
+            this.downUserMessages.push(chatMessageBdModel._id);
+        }
+        toUser.sendMessage(new PrimaryResponse(chatMessageBdModel, `message#${this.messageIndex}`));
+        chatMessageBdModel.save();
     }
     private sendObject = (event: ChatEvent, toUser: SessionModel, fromUser: IUserSchema["_id"], object: ChatStartedResponse): void => {
         toUser.sendMessage(new PrimaryResponse(new ChatMessage({
